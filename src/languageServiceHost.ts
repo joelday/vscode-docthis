@@ -25,9 +25,7 @@ export class LanguageServiceHost implements ts.LanguageServiceHost {
             
         this._fileNames = (this._config ? this._config.fileNames : [this._fileName])
             .map(f => utils.fixWinPath(f));
-        
-        //this._files = {};
-        
+
         if (this._files[fileName]) {
             this._files[fileName].version++;
         }
