@@ -7,7 +7,7 @@ export function activate(context: vs.ExtensionContext): void {
     
     context.subscriptions.push(vs.commands.registerTextEditorCommand("docthis.documentThis", (editor, edit) => {
         try {
-            documenter.documentHere(editor, edit);
+            documenter.documentThis(editor, edit);
         }
         catch (e) {
             console.error(e);

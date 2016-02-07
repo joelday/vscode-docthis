@@ -94,7 +94,7 @@ function loadTsConfig(fileName: string) {
 function resolveTsConfigFileName(fileName: string): string {
     let searchPath = path.resolve(vs.workspace.rootPath);
     
-    if (utils.isUndefined(vs.workspace.rootPath)) {
+    if (!vs.workspace.rootPath) {
         return null;
     }
     

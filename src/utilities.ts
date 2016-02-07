@@ -9,41 +9,6 @@ export function fixWinPath(filePath: string) {
     return filePath;
 }
 
-export function isUndefined(obj: any): boolean {
-    return typeof obj === "undefined";
-}
-
-export function isNullOrUndefined(obj: any): boolean {
-    return obj === null || isUndefined(obj);
-}
-
-export function firstOrNull<T>(arr: T[], callbackfn: (value: T, index?: number, arr?: T[]) => boolean): T {
-    let result: T = null;
-    
-    arr.every((v, i, a) => {
-        let match = callbackfn(v, i, a);
-        if (!!match) {
-            result = v;
-            return false;
-        }
-        return true;
-    });
-    
-    return result;
-}
-
-export function where<T>(arr: T[], callbackfn: (value: T, index?: number, arr?: T[]) => boolean): T[] {
-    let results: T[] = [];
-    
-    arr.forEach((v, i, a) => {
-        if (callbackfn(v, i, a)) {
-            results.push(v);
-        }
-    });
-    
-    return results;
-}
-
 export function findChildForPosition(node: ts.Node, position: number): ts.Node {
     let lastMatchingNode: ts.Node;
     
@@ -110,18 +75,6 @@ export class StringBuilder {
         
         return sb.toString();
     }
-}
-
-export function camelCaseToSentenceCase(text: string) {
-    return text.replace(/([^A-Z]+)|([A-Z]+[^A-Z]*)/g,
-    (word) => {
-        return word.toLowerCase() + " "; 
-    }).trim();
-}
-
-export function vowelPrefixedSentenceCase(name: string) {
-    let text = camelCaseToSentenceCase(name);
-    return (/^[aeiouAEIOU]/.test(text) ? "an" : "a") + " " + text;
 }
 
 export function formatTypeName(typeName: string) {

@@ -8,7 +8,6 @@ export class Documenter implements vs.Disposable {
     private _languageServiceHost: LanguageServiceHost;
     private _services: ts.LanguageService;
     private _program: ts.Program;
-    private _typeChecker: ts.TypeChecker;
     
     constructor() {
         this._languageServiceHost = new LanguageServiceHost();
@@ -16,10 +15,9 @@ export class Documenter implements vs.Disposable {
             this._languageServiceHost, ts.createDocumentRegistry());
             
         this._program = this._services.getProgram();
-        this._typeChecker = this._program.getTypeChecker();
     }
 
-    documentHere(editor: vs.TextEditor, edit: vs.TextEditorEdit) {
+    documentThis(editor: vs.TextEditor, edit: vs.TextEditorEdit) {
         const fileName = utils.fixWinPath(editor.document.fileName);
         const fileText = editor.document.getText();
         
@@ -47,7 +45,7 @@ export class Documenter implements vs.Disposable {
             ts.SyntaxKind.MethodDeclaration |
             ts.SyntaxKind.Constructor);
             
-        let sb = new utils.StringBuilder();
+        const sb = new utils.StringBuilder();
 
         switch (parent.kind) {
             case ts.SyntaxKind.ClassDeclaration:
@@ -75,8 +73,6 @@ export class Documenter implements vs.Disposable {
                 return;
         }
         
-        console.log(sb.toCommentString());
-        
         const lineAndChar = ts.getLineAndCharacterOfPosition(sourceFile, parent.getStart());
         const location = new vs.Position(lineAndChar.line, lineAndChar.character);
         const indentStartLocation = new vs.Position(lineAndChar.line, 0);
@@ -99,9 +95,8 @@ export class Documenter implements vs.Disposable {
     }
     
     private _emitClassDeclaration(sb: utils.StringBuilder, node: ts.ClassDeclaration) {
-        sb.appendLine(`A class that represents ${
-            utils.vowelPrefixedSentenceCase(node.name.getText())
-        }.`);
+        sb.appendLine("(description)");
+        sb.appendLine();
         
         this._emitModifiers(sb, node);
         this._emitHeritageClauses(sb, node);
@@ -109,19 +104,20 @@ export class Documenter implements vs.Disposable {
     }
     
     private _emitPropertyDeclaration(sb: utils.StringBuilder, node: ts.PropertyDeclaration | ts.AccessorDeclaration) {
-        sb.appendLine(`The ${ utils.camelCaseToSentenceCase( node.name.getText() ) }.`);
+        sb.appendLine("(description)");
+        sb.appendLine();
         
         if (node.type) {
-            sb.appendLine(`@type {${ utils.formatTypeName(node.type.getText()) }}`);
+            sb.append(`@type {${ utils.formatTypeName(node.type.getText()) }}`);
         }
         
         this._emitModifiers(sb, node);
+        
+        sb.appendLine(" - (description)");
     }
     
     private _emitInterfaceDeclaration(sb: utils.StringBuilder, node: ts.InterfaceDeclaration) {
-        sb.appendLine(`An interface that represents ${
-            utils.vowelPrefixedSentenceCase(node.name.text)
-        }.`);
+        sb.appendLine("(description)");
         sb.appendLine();
         
         this._emitModifiers(sb, node);
@@ -133,9 +129,8 @@ export class Documenter implements vs.Disposable {
     }
     
     private _emitEnumDeclaration(sb: utils.StringBuilder, node: ts.EnumDeclaration) {
-        sb.appendLine(`An enum that represents ${
-            utils.vowelPrefixedSentenceCase(node.name.text)
-        }.`);
+        sb.appendLine("(description)");
+        sb.appendLine();
         
         this._emitModifiers(sb, node);
         
@@ -143,7 +138,8 @@ export class Documenter implements vs.Disposable {
     }
     
     private _emitMethodDeclaration(sb: utils.StringBuilder, node: ts.MethodDeclaration | ts.FunctionDeclaration) {
-        sb.appendLine(`(Description).`);
+        sb.appendLine("(description)");
+        sb.appendLine();
         
         this._emitModifiers(sb, node);
         this._emitTypeParameters(sb, node);
@@ -197,7 +193,7 @@ export class Documenter implements vs.Disposable {
                 sb.append("]");
             }
 
-            sb.append(" - (Description).");
+            sb.append(" - (description)");
             sb.appendLine();
         });
     }
