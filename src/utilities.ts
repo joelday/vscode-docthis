@@ -125,6 +125,8 @@ export function vowelPrefixedSentenceCase(name: string) {
 }
 
 export function formatTypeName(typeName: string) {
+    typeName = typeName.trim();
+    
     if (typeName === "any" || typeName === "") {
         return "*";
     }
