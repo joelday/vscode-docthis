@@ -15,17 +15,14 @@
     ],
     "main": "./out/src/extension",
     "contributes": {
-        "commands": [
-        {
+        "commands": [{
             "command": "docthis.documentThis",
             "title": "Document This"
         }],
-        "keybindings": [
-            {
-                "command": "docthis.documentThis",
-                "key": "alt+shift+d"
-            }
-        ]
+        "keybindings": [{
+            "command": "docthis.documentThis",
+            "key": "alt+shift+d"
+        }]
     },
     "scripts": {
         "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
