@@ -2,7 +2,7 @@
     "name": "docthis",
     "displayName": "Document This",
     "description": "Automatically generates detailed JSDoc comments in TypeScript files.",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "publisher": "joelday",
     "engines": {
         "vscode": "^0.10.6"

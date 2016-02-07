@@ -11,6 +11,7 @@ export function activate(context: vs.ExtensionContext): void {
         }
         catch (e) {
             console.error(e);
+            vs.window.showErrorMessage(`Sorry! 'Document This' encountered an error: ${e.toString()}.`);
         }
     }));
 }

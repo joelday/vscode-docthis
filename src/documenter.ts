@@ -70,6 +70,7 @@ export class Documenter implements vs.Disposable {
                 this._emitConstructorDeclaration(sb, <ts.ConstructorDeclaration>parent);
                 break;
             default:
+                vs.window.showErrorMessage("Sorry! 'Document This' wasn't able to produce documentation at the current carat position.");
                 return;
         }
         
