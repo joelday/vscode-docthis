@@ -80,7 +80,11 @@ export class StringBuilder {
 export function formatTypeName(typeName: string) {
     typeName = typeName.trim();
     
-    if (typeName === "any" || typeName === "") {
+    if (typeName === "") {
+        return null;
+    }
+    
+    if (typeName === "any") {
         return "*";
     }
     
@@ -88,5 +92,5 @@ export function formatTypeName(typeName: string) {
         typeName = "(" + typeName + ")";
     }
     
-    return typeName;
+    return "{" + typeName + "}";
 }

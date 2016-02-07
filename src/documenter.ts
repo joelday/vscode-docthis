@@ -4,6 +4,16 @@ import * as utils from "./utilities";
 
 import { LanguageServiceHost } from "./languageServiceHost";
 
+const supportedNodeKinds = 
+    ts.SyntaxKind.ClassDeclaration |
+    ts.SyntaxKind.PropertyDeclaration |
+    ts.SyntaxKind.GetAccessor |
+    ts.SyntaxKind.SetAccessor |
+    ts.SyntaxKind.InterfaceDeclaration |
+    ts.SyntaxKind.EnumDeclaration |
+    ts.SyntaxKind.MethodDeclaration |
+    ts.SyntaxKind.Constructor;
+
 export class Documenter implements vs.Disposable {
     private _languageServiceHost: LanguageServiceHost;
     private _services: ts.LanguageService;
@@ -18,34 +28,72 @@ export class Documenter implements vs.Disposable {
     }
 
     documentThis(editor: vs.TextEditor, edit: vs.TextEditorEdit) {
-        const fileName = utils.fixWinPath(editor.document.fileName);
-        const fileText = editor.document.getText();
-        
+        if (!this._checkLanguageSupport(editor.document)) {
+            return;
+        }
+
         const selection = editor.selection;
         const carat = selection.start;
-        
-        this._languageServiceHost.addFile(fileName, fileText);
-        
-        const sourceFile = this._services.getSourceFile(fileName);
 
+        const sourceFile = this._getSourceFile(editor.document);
+        
         const position = ts.getPositionOfLineAndCharacter(sourceFile, carat.line, carat.character)
         const node = utils.findChildForPosition(sourceFile, position);
         
-        this._documentNode(node, editor, edit, sourceFile);
+        const sb = new utils.StringBuilder();
+        
+        const docLocation = this._documentNode(sb, node, editor, sourceFile);
+        if (docLocation) {
+            this._insertDocumentation(sb, docLocation, editor, edit, sourceFile);
+        } else {
+            this._showFailureMessage();
+        }
     }
     
-    private _documentNode(node: ts.Node, editor: vs.TextEditor, edit: vs.TextEditorEdit, sourceFile: ts.SourceFile) {
-        const parent = utils.findFirstParentOfKind(node,
-            ts.SyntaxKind.ClassDeclaration |
-            ts.SyntaxKind.PropertyDeclaration |
-            ts.SyntaxKind.GetAccessor |
-            ts.SyntaxKind.SetAccessor |
-            ts.SyntaxKind.InterfaceDeclaration |
-            ts.SyntaxKind.EnumDeclaration |
-            ts.SyntaxKind.MethodDeclaration |
-            ts.SyntaxKind.Constructor);
+    private _showFailureMessage() {
+        vs.window.showErrorMessage("Sorry! 'Document This' wasn't able to produce documentation at the current carat position.");
+    }
+    
+    private _checkLanguageSupport(document: vs.TextDocument) {
+        if (document.languageId !== "javascript" &&
+            document.languageId !== "typescript") {
+                vs.window.showWarningMessage("Sorry! 'Document This' currently supports JavaScript and TypeScript only.");
+                return false;
+            }
             
-        const sb = new utils.StringBuilder();
+        return true;
+    }
+    
+    private _insertDocumentation(sb: utils.StringBuilder, position: ts.LineAndCharacter, editor: vs.TextEditor, edit: vs.TextEditorEdit, sourceFile: ts.SourceFile) {
+        const location = new vs.Position(position.line, position.character);
+        const indentStartLocation = new vs.Position(position.line, 0);
+        
+        const indent = editor.document.getText(new vs.Range(
+             indentStartLocation,
+             location
+        ));
+
+        edit.insert(location, sb.toCommentString(indent));
+        
+        const newText = editor.document.getText();
+        sourceFile.update(newText, <ts.TextChangeRange>{
+            newLength: newText.length,
+            span: <ts.TextSpan>{
+                start: 0,
+                length: newText.length
+            }
+        });
+    }
+    
+    private _getSourceFile(document: vs.TextDocument) {
+        const fileName = utils.fixWinPath(document.fileName);
+        const fileText = document.getText();
+        this._languageServiceHost.addFile(fileName, fileText);
+        return this._services.getSourceFile(fileName);
+    }
+    
+    private _documentNode(sb: utils.StringBuilder, node: ts.Node, editor: vs.TextEditor, sourceFile: ts.SourceFile) {
+        const parent = utils.findFirstParentOfKind(node, supportedNodeKinds);
 
         switch (parent.kind) {
             case ts.SyntaxKind.ClassDeclaration:
@@ -70,31 +118,12 @@ export class Documenter implements vs.Disposable {
                 this._emitConstructorDeclaration(sb, <ts.ConstructorDeclaration>parent);
                 break;
             default:
-                vs.window.showErrorMessage("Sorry! 'Document This' wasn't able to produce documentation at the current carat position.");
                 return;
         }
         
-        const lineAndChar = ts.getLineAndCharacterOfPosition(sourceFile, parent.getStart());
-        const location = new vs.Position(lineAndChar.line, lineAndChar.character);
-        const indentStartLocation = new vs.Position(lineAndChar.line, 0);
-        
-        const indent = editor.document.getText(new vs.Range(
-             indentStartLocation,
-             location
-        ));
-
-        edit.insert(location, sb.toCommentString(indent));
-        
-        const newText = editor.document.getText();
-        sourceFile.update(newText, <ts.TextChangeRange>{
-            newLength: newText.length,
-            span: <ts.TextSpan>{
-                start: 0,
-                length: newText.length
-            }
-        });
+        return ts.getLineAndCharacterOfPosition(sourceFile, parent.getStart());
     }
-    
+
     private _emitClassDeclaration(sb: utils.StringBuilder, node: ts.ClassDeclaration) {
         sb.appendLine("(description)");
         sb.appendLine();
@@ -109,12 +138,10 @@ export class Documenter implements vs.Disposable {
         sb.appendLine();
         
         if (node.type) {
-            sb.append(`@type {${ utils.formatTypeName(node.type.getText()) }}`);
+            sb.append(`@type ${ utils.formatTypeName(node.type.getText()) }`);
         }
         
         this._emitModifiers(sb, node);
-        
-        sb.appendLine(" - (description)");
     }
     
     private _emitInterfaceDeclaration(sb: utils.StringBuilder, node: ts.InterfaceDeclaration) {
@@ -146,9 +173,12 @@ export class Documenter implements vs.Disposable {
         this._emitTypeParameters(sb, node);
         this._emitParameters(sb, node);
         
+        sb.append("@returns");
         if (node.type) {
-            sb.appendLine(`@returns {${ utils.formatTypeName(node.type.getText()) }}`);
+            sb.append(" " + utils.formatTypeName(node.type.getText()));
         }
+        
+        sb.appendLine(" (description)");
     }
     
     private _emitParameters(sb: utils.StringBuilder, node:
@@ -162,23 +192,23 @@ export class Documenter implements vs.Disposable {
             const isArgs = !!parameter.dotDotDotToken;
             const initializerValue = parameter.initializer ? parameter.initializer.getText() : null;
             
-            let typeName = "";
+            let typeName = null;
             
             if (parameter.initializer) {
                 if (/^[0-9]/.test(initializerValue)) {
                     typeName = "number";
                 }
-                else if (initializerValue.indexOf("\"") !== -1 || initializerValue.indexOf("'") !== -1) {
+                else if (initializerValue.indexOf("\"") !== -1 ||
+                        initializerValue.indexOf("'") !== -1 ||
+                        initializerValue.indexOf("`") !== -1) {
                     typeName = "string";
                 }
             }
             else if (parameter.type) {
-                typeName = parameter.type.getFullText();
+                typeName = utils.formatTypeName(isArgs ? "..." : "" + parameter.type.getFullText());
             }
-            
-            typeName = utils.formatTypeName(typeName);
 
-            sb.append(`@param {${ isArgs ? "..." : "" }${ typeName }} `);
+            sb.append(`@param ${typeName} `);
             
             if (isOptional) {
                 sb.append("[");
@@ -186,7 +216,7 @@ export class Documenter implements vs.Disposable {
             
             sb.append(name);
             
-            if (parameter.initializer) {
+            if (parameter.initializer && typeName) {
                 sb.append("=" + parameter.initializer.getText());
             }
             
@@ -194,8 +224,7 @@ export class Documenter implements vs.Disposable {
                 sb.append("]");
             }
 
-            sb.append(" - (description)");
-            sb.appendLine();
+            sb.appendLine(" (description)");
         });
     }
     
@@ -222,7 +251,7 @@ export class Documenter implements vs.Disposable {
             const heritageType = clause.token === ts.SyntaxKind.ExtendsKeyword ? "@extends" : "@implements";
             
             clause.types.forEach(t => {
-                sb.appendLine(`${ heritageType } {${ utils.formatTypeName(t.expression.getText()) }}`);
+                sb.appendLine(`${ heritageType } ${ utils.formatTypeName(t.expression.getText()) }`);
             });
         });
     }

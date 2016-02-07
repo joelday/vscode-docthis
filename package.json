@@ -1,8 +1,8 @@
 {
     "name": "docthis",
     "displayName": "Document This",
-    "description": "Automatically generates detailed JSDoc comments in TypeScript files.",
-    "version": "0.0.5",
+    "description": "Automatically generates detailed JSDoc comments in TypeScript and JavaScript files.",
+    "version": "0.0.6",
     "publisher": "joelday",
     "engines": {
         "vscode": "^0.10.6"
@@ -11,6 +11,7 @@
         "Other", "Snippets", "Languages"
     ],
     "activationEvents": [
+        "onLanguage:javascript",
         "onLanguage:typescript"
     ],
     "main": "./out/src/extension",
