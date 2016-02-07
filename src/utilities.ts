@@ -1,6 +1,17 @@
 import * as path from "path";
 import * as ts from "typescript";
 
+const supportedNodeKinds = [
+    ts.SyntaxKind.ClassDeclaration,
+    ts.SyntaxKind.PropertyDeclaration,
+    ts.SyntaxKind.GetAccessor,
+    ts.SyntaxKind.SetAccessor,
+    ts.SyntaxKind.InterfaceDeclaration,
+    ts.SyntaxKind.EnumDeclaration,
+    ts.SyntaxKind.FunctionDeclaration,
+    ts.SyntaxKind.MethodDeclaration,
+    ts.SyntaxKind.Constructor ];
+
 export function fixWinPath(filePath: string) {
     if (path.sep === "\\") {
         return filePath.replace(/\\/g, "/");
@@ -32,10 +43,48 @@ export function findChildForPosition(node: ts.Node, position: number): ts.Node {
     return lastMatchingNode;
 }
 
-export function findFirstParentOfKind(node: ts.Node, kind: ts.SyntaxKind) {
+export function findChildrenOfKind(node: ts.Node, kinds = supportedNodeKinds) {
+    let children: ts.Node[] = [];
+    
+    node.getChildren().forEach(c => {
+        if (nodeIsOfKind(c, kinds)) {
+            children.push(c);
+        }
+        
+        children = children.concat(findChildrenOfKind(c, kinds));
+    });
+    
+    return children;
+}
+
+export function findVisibleChildrenOfKind(node: ts.Node, kinds = supportedNodeKinds) {
+    let children = findChildrenOfKind(node, supportedNodeKinds);
+    
+    return children.filter(child => {
+        if (child.modifiers && child.modifiers.find(m => m.kind === ts.SyntaxKind.PrivateKeyword)) {
+            return false;
+        }
+        
+        if (child.kind === ts.SyntaxKind.ClassDeclaration ||
+            child.kind === ts.SyntaxKind.InterfaceDeclaration ||
+            child.kind === ts.SyntaxKind.FunctionDeclaration) {
+                if (!child.modifiers || !child.modifiers.find(m => m.kind === ts.SyntaxKind.ExportKeyword)) {
+                    return false;
+                }
+            }
+         
+        return true;
+    });
+}
+
+export function nodeIsOfKind(node: ts.Node, kinds = supportedNodeKinds) {
+    return !!node && !!kinds.find(k => node.kind === k);
+}
+
+export function findFirstParent(node: ts.Node, kinds = supportedNodeKinds) {
     let parent = node.parent;
     while (parent) {
-        if ((parent.kind & kind) !== 0) {
+        if (nodeIsOfKind(parent, kinds)) {
             return parent;
         }
         

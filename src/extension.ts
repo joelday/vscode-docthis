@@ -7,11 +7,31 @@ export function activate(context: vs.ExtensionContext): void {
     
     context.subscriptions.push(vs.commands.registerTextEditorCommand("docthis.documentThis", (editor, edit) => {
         try {
-            documenter.documentThis(editor, edit);
+            documenter.documentThis(editor, edit, "Document This");
         }
         catch (e) {
             console.error(e);
             vs.window.showErrorMessage(`Sorry! 'Document This' encountered an error: ${e.toString()}.`);
+        }
+    }));
+    
+    context.subscriptions.push(vs.commands.registerTextEditorCommand("docthis.documentEverything", (editor, edit) => {
+        try {
+            documenter.documentEverything(editor, edit, false, "Document Everything");
+        }
+        catch (e) {
+            console.error(e);
+            vs.window.showErrorMessage(`Sorry! 'Document Everything' encountered an error: ${e.toString()}.`);
+        }
+    }));
+    
+    context.subscriptions.push(vs.commands.registerTextEditorCommand("docthis.documentEverythingVisible", (editor, edit) => {
+        try {
+            documenter.documentEverything(editor, edit, true, "Document Everything Visible");
+        }
+        catch (e) {
+            console.error(e);
+            vs.window.showErrorMessage(`Sorry! 'Document Everything Visible' encountered an error: ${e.toString()}.`);
         }
     }));
 }

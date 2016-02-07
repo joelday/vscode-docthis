@@ -4,16 +4,6 @@ import * as utils from "./utilities";
 
 import { LanguageServiceHost } from "./languageServiceHost";
 
-const supportedNodeKinds = 
-    ts.SyntaxKind.ClassDeclaration |
-    ts.SyntaxKind.PropertyDeclaration |
-    ts.SyntaxKind.GetAccessor |
-    ts.SyntaxKind.SetAccessor |
-    ts.SyntaxKind.InterfaceDeclaration |
-    ts.SyntaxKind.EnumDeclaration |
-    ts.SyntaxKind.MethodDeclaration |
-    ts.SyntaxKind.Constructor;
-
 export class Documenter implements vs.Disposable {
     private _languageServiceHost: LanguageServiceHost;
     private _services: ts.LanguageService;
@@ -27,8 +17,8 @@ export class Documenter implements vs.Disposable {
         this._program = this._services.getProgram();
     }
 
-    documentThis(editor: vs.TextEditor, edit: vs.TextEditorEdit) {
-        if (!this._checkLanguageSupport(editor.document)) {
+    documentThis(editor: vs.TextEditor, edit: vs.TextEditorEdit, commandName: string) {
+        if (!this._checkLanguageSupport(editor.document, commandName)) {
             return;
         }
 
@@ -39,25 +29,54 @@ export class Documenter implements vs.Disposable {
         
         const position = ts.getPositionOfLineAndCharacter(sourceFile, carat.line, carat.character)
         const node = utils.findChildForPosition(sourceFile, position);
+        const parent = utils.nodeIsOfKind(node) ? node : utils.findFirstParent(node);
         
         const sb = new utils.StringBuilder();
         
-        const docLocation = this._documentNode(sb, node, editor, sourceFile);
+        const docLocation = this._documentNode(sb, parent, editor, sourceFile);
         if (docLocation) {
             this._insertDocumentation(sb, docLocation, editor, edit, sourceFile);
         } else {
-            this._showFailureMessage();
+            this._showFailureMessage(commandName, "at the current carat position");
         }
     }
     
-    private _showFailureMessage() {
-        vs.window.showErrorMessage("Sorry! 'Document This' wasn't able to produce documentation at the current carat position.");
+    documentEverything(editor: vs.TextEditor, edit: vs.TextEditorEdit, visibleOnly: boolean, commandName: string) {
+        if (!this._checkLanguageSupport(editor.document, commandName)) {
+            return;
+        }
+        
+        let sourceFile = this._getSourceFile(editor.document);
+        const documentable = visibleOnly ? utils.findVisibleChildrenOfKind(sourceFile) : utils.findChildrenOfKind(sourceFile);
+        
+        let showFailure = false;
+        
+        documentable.forEach(node => {
+            const sb = new utils.StringBuilder();
+
+            const docLocation = this._documentNode(sb, node, editor, sourceFile);
+            if (docLocation) {
+                this._insertDocumentation(sb, docLocation, editor, edit, sourceFile);
+            } else {
+                showFailure = true;
+            }
+            
+            sourceFile = this._getSourceFile(editor.document);
+        });
+        
+        if (showFailure) {
+            this._showFailureMessage(commandName, "for everything in the document");
+        }
     }
     
-    private _checkLanguageSupport(document: vs.TextDocument) {
+    private _showFailureMessage(commandName: string, condition: string) {
+        vs.window.showErrorMessage(`Sorry! '${commandName}' wasn't able to produce documentation ${condition}.`);
+    }
+    
+    private _checkLanguageSupport(document: vs.TextDocument, commandName: string) {
         if (document.languageId !== "javascript" &&
             document.languageId !== "typescript") {
-                vs.window.showWarningMessage("Sorry! 'Document This' currently supports JavaScript and TypeScript only.");
+                vs.window.showWarningMessage(`Sorry! '${commandName}' currently supports JavaScript and TypeScript only.`);
                 return false;
             }
             
@@ -93,40 +112,40 @@ export class Documenter implements vs.Disposable {
     }
     
     private _documentNode(sb: utils.StringBuilder, node: ts.Node, editor: vs.TextEditor, sourceFile: ts.SourceFile) {
-        const parent = utils.findFirstParentOfKind(node, supportedNodeKinds);
-
-        switch (parent.kind) {
+        switch (node.kind) {
             case ts.SyntaxKind.ClassDeclaration:
-                this._emitClassDeclaration(sb, <ts.ClassDeclaration>parent);
+                this._emitClassDeclaration(sb, <ts.ClassDeclaration>node);
                 break;
             case ts.SyntaxKind.PropertyDeclaration:
             case ts.SyntaxKind.GetAccessor:
             case ts.SyntaxKind.SetAccessor:
-                this._emitPropertyDeclaration(sb, <ts.AccessorDeclaration>parent);
+                this._emitPropertyDeclaration(sb, <ts.AccessorDeclaration>node);
                 break;
             case ts.SyntaxKind.InterfaceDeclaration:
-                this._emitInterfaceDeclaration(sb, <ts.InterfaceDeclaration>parent);
+                this._emitInterfaceDeclaration(sb, <ts.InterfaceDeclaration>node);
                 break;
             case ts.SyntaxKind.EnumDeclaration:
-                this._emitEnumDeclaration(sb, <ts.EnumDeclaration>parent);
+                this._emitEnumDeclaration(sb, <ts.EnumDeclaration>node);
                 break;
             case ts.SyntaxKind.FunctionDeclaration:
             case ts.SyntaxKind.MethodDeclaration:
-                this._emitMethodDeclaration(sb, <ts.MethodDeclaration>parent);
+                this._emitMethodDeclaration(sb, <ts.MethodDeclaration>node);
                 break;
             case ts.SyntaxKind.Constructor:
-                this._emitConstructorDeclaration(sb, <ts.ConstructorDeclaration>parent);
+                this._emitConstructorDeclaration(sb, <ts.ConstructorDeclaration>node);
                 break;
             default:
                 return;
         }
         
-        return ts.getLineAndCharacterOfPosition(sourceFile, parent.getStart());
+        return ts.getLineAndCharacterOfPosition(sourceFile, node.getStart());
     }
 
     private _emitClassDeclaration(sb: utils.StringBuilder, node: ts.ClassDeclaration) {
         sb.appendLine("(description)");
         sb.appendLine();
+        
+        sb.appendLine(`@class ${ node.name.getText() }`)
         
         this._emitModifiers(sb, node);
         this._emitHeritageClauses(sb, node);
@@ -137,11 +156,11 @@ export class Documenter implements vs.Disposable {
         sb.appendLine("(description)");
         sb.appendLine();
         
+        this._emitModifiers(sb, node);
+        
         if (node.type) {
             sb.append(`@type ${ utils.formatTypeName(node.type.getText()) }`);
         }
-        
-        this._emitModifiers(sb, node);
     }
     
     private _emitInterfaceDeclaration(sb: utils.StringBuilder, node: ts.InterfaceDeclaration) {
@@ -232,6 +251,7 @@ export class Documenter implements vs.Disposable {
         sb.appendLine(`Creates an instance of ${
             (<ts.ClassDeclaration>node.parent).name.getText()
         }.`);
+        sb.appendLine();
         
         this._emitParameters(sb, node);
     }

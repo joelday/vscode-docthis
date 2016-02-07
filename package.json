@@ -2,7 +2,7 @@
     "name": "docthis",
     "displayName": "Document This",
     "description": "Automatically generates detailed JSDoc comments in TypeScript and JavaScript files.",
-    "version": "0.0.6",
+    "version": "0.1.0",
     "publisher": "joelday",
     "engines": {
         "vscode": "^0.10.6"
@@ -19,10 +19,25 @@
         "commands": [{
             "command": "docthis.documentThis",
             "title": "Document This"
+        }, {
+            "command": "docthis.documentEverything",
+            "title": "Document Everything"
+        },  {
+            "command": "docthis.documentEverythingVisible",
+            "title": "Document Everything Visible"
         }],
         "keybindings": [{
             "command": "docthis.documentThis",
-            "key": "alt+shift+d"
+            "key": "ctrl+d ctrl+d",
+            "mac": "cmd+d cmd+d"
+        }, {
+            "command": "docthis.documentEverything",
+            "key": "ctrl+d ctrl+e",
+            "mac": "cmd+d cmd+e"
+        }, {
+            "command": "docthis.documentEverythingVisible",
+            "key": "ctrl+d ctrl+v",
+            "mac": "cmd+d cmd+v"
         }]
     },
     "scripts": {
