@@ -24,17 +24,17 @@ export class Documenter implements vs.Disposable {
         const selection = editor.selection;
         const carat = selection.start;
         
-        this._languageServiceHost.initForFile(fileName, fileText);
+        this._languageServiceHost.addFile(fileName, fileText);
         
         const sourceFile = this._services.getSourceFile(fileName);
 
         const position = ts.getPositionOfLineAndCharacter(sourceFile, carat.line, carat.character)
         const node = utils.findChildForPosition(sourceFile, position);
         
-        this._documentNode(node, editor, edit, fileName, sourceFile);
+        this._documentNode(node, editor, edit, sourceFile);
     }
     
-    private _documentNode(node: ts.Node, editor: vs.TextEditor, edit: vs.TextEditorEdit, fileName: string, sourceFile: ts.SourceFile) {
+    private _documentNode(node: ts.Node, editor: vs.TextEditor, edit: vs.TextEditorEdit, sourceFile: ts.SourceFile) {
         const parent = utils.findFirstParentOfKind(node,
             ts.SyntaxKind.ClassDeclaration |
             ts.SyntaxKind.PropertyDeclaration |
