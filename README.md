@@ -4,7 +4,7 @@
 ![Demo](images/demo.gif)
 
 # Functionality
-@class, @constant, @enum, @exports, @function, @implements, @interface, @param, @private, @returns, @static and @type tags are supported.
+@class, @constant, @enum, @exports, @function, @implements, @interface, @param, @private, @returns, @static, @template and @type tags are supported.
 
 # Commands
 ## Document This
