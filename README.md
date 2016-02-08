@@ -1,12 +1,10 @@
-<img src="https://raw.githubusercontent.com/joelday/vscode-docthis/master/images/icon.svg" width="128" />
-
 # Document This
-This Visual Studio Code extension automatically generates detailed JSDoc comments for both TypeScript and JavaScript files.
+"Document This" is a Visual Studio Code extension that automatically generates detailed JSDoc comments for both TypeScript and JavaScript files.
 
-![](images/demo.gif)
+![Demo](images/demo.gif)
 
 # Functionality
-"Document This" generates thorough JSDoc comments with support for @class, @constant, @enum, @exports, @function, @implements, @interface, @param, @private, @returns, @static and @type.
+@class, @constant, @enum, @exports, @function, @implements, @interface, @param, @private, @returns, @static and @type tags are supported.
 
 # Commands
 ## Document This
