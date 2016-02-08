@@ -203,7 +203,7 @@ export class Documenter implements vs.Disposable {
         this._emitTypeParameters(sb, node);
         this._emitParameters(sb, node);
         
-        if (node.getFullText().indexOf("return") !== -1) {
+        if (node.getFullText().indexOf("return ") !== -1) {
             /**
              * TODO: I assume this check will break for named nested functions?
              * Will test soon.
@@ -231,13 +231,18 @@ export class Documenter implements vs.Disposable {
             let typeName = null;
             
             if (parameter.initializer) {
+                // TODO: Avoid false positives on type detection.
                 if (/^[0-9]/.test(initializerValue)) {
                     typeName = "{number}";
                 }
                 else if (initializerValue.indexOf("\"") !== -1 ||
-                        initializerValue.indexOf("'") !== -1 ||
-                        initializerValue.indexOf("`") !== -1) {
+                         initializerValue.indexOf("'") !== -1 ||
+                         initializerValue.indexOf("`") !== -1) {
                     typeName = "{string}";
+                }
+                else if (initializerValue.indexOf("true") !== -1 ||
+                         initializerValue.indexOf("false") !== -1) {
+                    typeName = "{boolean}";
                 }
             }
             else if (parameter.type) {
