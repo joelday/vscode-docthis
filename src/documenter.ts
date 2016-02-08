@@ -29,11 +29,16 @@ export class Documenter implements vs.Disposable {
         
         const position = ts.getPositionOfLineAndCharacter(sourceFile, carat.line, carat.character)
         const node = utils.findChildForPosition(sourceFile, position);
-        const parent = utils.nodeIsOfKind(node) ? node : utils.findFirstParent(node);
+        const documentNode = utils.nodeIsOfKind(node) ? node : utils.findFirstParent(node);
+        
+        if (!documentNode) {
+            this._showFailureMessage(commandName, "at the current carat position");
+            return;
+        }
         
         const sb = new utils.StringBuilder();
         
-        const docLocation = this._documentNode(sb, parent, editor, sourceFile);
+        const docLocation = this._documentNode(sb, documentNode, editor, sourceFile);
         if (docLocation) {
             this._insertDocumentation(sb, docLocation, editor, edit, sourceFile);
         } else {
@@ -234,7 +239,11 @@ export class Documenter implements vs.Disposable {
                 typeName = utils.formatTypeName(isArgs ? "..." : "" + parameter.type.getFullText());
             }
 
-            sb.append(`@param ${typeName} `);
+            sb.append("@param ");
+            
+            if (typeName) {
+                sb.append(typeName + " ");
+            }
             
             if (isOptional) {
                 sb.append("[");
