@@ -112,7 +112,7 @@ export class Documenter implements vs.Disposable {
     private _getSourceFile(document: vs.TextDocument) {
         const fileName = utils.fixWinPath(document.fileName);
         const fileText = document.getText();
-        this._languageServiceHost.addFile(fileName, fileText);
+        this._languageServiceHost.setCurrentFile(fileName, fileText);
         return this._services.getSourceFile(fileName);
     }
     
@@ -205,9 +205,8 @@ export class Documenter implements vs.Disposable {
         
         if (node.getFullText().indexOf("return ") !== -1) {
             /**
-             * TODO: I assume this check will break for named nested functions?
-             * Will test soon.
-             */
+             * TODO: Search for return as a child node, stopping at any documentable node.
+             */ 
             sb.append("@returns");
             if (node.type) {
                 sb.append(" " + utils.formatTypeName(node.type.getText()));
@@ -307,6 +306,8 @@ export class Documenter implements vs.Disposable {
         
         node.modifiers.forEach(modifier => {
             switch (modifier.kind) {
+                case ts.SyntaxKind.ExportKeyword:
+                sb.appendLine("@export"); return;
                 case ts.SyntaxKind.AbstractKeyword:
                 sb.appendLine("@abstract"); return;
                 case ts.SyntaxKind.ProtectedKeyword:

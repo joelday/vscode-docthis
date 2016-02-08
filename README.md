@@ -4,18 +4,18 @@
 ![Demo](images/demo.gif)
 
 # Functionality
-@class, @constant, @enum, @function, @implements, @interface, @param, @private, @returns, @static, @template and @type tags are supported.
+Supports official JSDoc and Closure Compiler tags: @class, @constant, @enum, @export, @function, @implements, @interface, @param, @private, @returns, @static, @template and @type.
 
 # Commands
 ## Document This
-`Windows: Ctrl-Shift-D Ctrl-Shift-D` | `Mac: Cmd-Shift-D Cmd-Shift-D`
+`Windows: Ctrl-D Ctrl-D` | `Mac: Cmd-D Cmd-D`
 
 Generates documentation for whatever the carat is on or inside of.
 ## Document Everything
-`Windows: Ctrl-Shift-D Ctrl-Shift-E` | `Mac: Cmd-Shift-D Cmd-Shift-E`
+`Windows: Ctrl-D Ctrl-E` | `Mac: Cmd-D Cmd-E`
 
 Generates documentation for all symbols that are supported by the extension.
 ## Document Everything Visible
-`Windows: Ctrl-Shift-D Ctrl-Shift-V` | `Mac: Cmd-Shift-D Cmd-Shift-V`
+`Windows: Ctrl-D Ctrl-V` | `Mac: Cmd-D Cmd-V`
 
 Generates documentation for exported, public and protected symbols in the document.

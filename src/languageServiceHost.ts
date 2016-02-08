@@ -7,7 +7,6 @@ import * as fs from "fs";
 const tsConfigFileName = "tsconfig.json";
 
 export class LanguageServiceHost implements ts.LanguageServiceHost {
-    private _fileName: string;
     private _editorFileSnapshot: ts.IScriptSnapshot;
     private _fileNames: string[];
     private _files: ts.Map<{ text: string; version: number; }>;
@@ -17,9 +16,11 @@ export class LanguageServiceHost implements ts.LanguageServiceHost {
         this._files = {};
     }
     
-    addFile(fileName: string, fileText: string) {
-        this._fileName = fileName;
-
+    setCurrentFile(fileName: string, fileText: string) {
+        for (let fileName in this._files) {
+            delete this._files[fileName].text;
+        }
+        
         if (this._files[fileName]) {
             this._files[fileName].version++;
             this._files[fileName].text = fileText;
