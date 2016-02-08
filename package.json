@@ -2,7 +2,7 @@
     "name": "docthis",
     "displayName": "Document This",
     "description": "Automatically generates detailed JSDoc comments in TypeScript and JavaScript files.",
-    "version": "0.1.14",
+    "version": "0.1.15",
     "publisher": "joelday",
     "icon": "images/icon.svg",
     "galleryBanner": {
