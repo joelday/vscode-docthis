@@ -8,14 +8,14 @@
 
 # Commands
 ## Document This
-(`Windows: Ctrl-Shift-D Ctrl-Shift-D, Mac: Cmd-Shift-D Cmd-Shift-D`)
+`Windows: Ctrl-Shift-D Ctrl-Shift-D` | `Mac: Cmd-Shift-D Cmd-Shift-D`
 
 Generates documentation for whatever the carat is on or inside of.
 ## Document Everything
-(`Windows: Ctrl-Shift-D Ctrl-Shift-E, Mac: Cmd-Shift-D Cmd-Shift-E`)
+`Windows: Ctrl-Shift-D Ctrl-Shift-E` | `Mac: Cmd-Shift-D Cmd-Shift-E`
 
 Generates documentation for all symbols that are supported by the extension.
 ## Document Everything Visible
-(`Windows: Ctrl-Shift-D Ctrl-Shift-V, Mac: Cmd-Shift-D Cmd-Shift-V`)
+`Windows: Ctrl-Shift-D Ctrl-Shift-V` | `Mac: Cmd-Shift-D Cmd-Shift-V`
 
 Generates documentation for exported, public and protected symbols in the document.
