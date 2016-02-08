@@ -232,12 +232,12 @@ export class Documenter implements vs.Disposable {
             
             if (parameter.initializer) {
                 if (/^[0-9]/.test(initializerValue)) {
-                    typeName = "number";
+                    typeName = "{number}";
                 }
                 else if (initializerValue.indexOf("\"") !== -1 ||
                         initializerValue.indexOf("'") !== -1 ||
                         initializerValue.indexOf("`") !== -1) {
-                    typeName = "string";
+                    typeName = "{string}";
                 }
             }
             else if (parameter.type) {
