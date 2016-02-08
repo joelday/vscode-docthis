@@ -230,7 +230,7 @@ export class Documenter implements vs.Disposable {
             
             let typeName = null;
             
-            if (parameter.initializer) {
+            if (parameter.initializer && !parameter.type) {
                 // TODO: Avoid false positives on type detection.
                 if (/^[0-9]/.test(initializerValue)) {
                     typeName = "{number}";
@@ -246,7 +246,7 @@ export class Documenter implements vs.Disposable {
                 }
             }
             else if (parameter.type) {
-                typeName = utils.formatTypeName(isArgs ? "..." : "" + parameter.type.getFullText());
+                typeName = utils.formatTypeName((isArgs ? "..." : "") + parameter.type.getFullText().trim());
             }
 
             sb.append("@param ");
