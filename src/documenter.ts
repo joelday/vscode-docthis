@@ -307,8 +307,6 @@ export class Documenter implements vs.Disposable {
         
         node.modifiers.forEach(modifier => {
             switch (modifier.kind) {
-                case ts.SyntaxKind.ExportKeyword:
-                sb.appendLine("@exports"); return;
                 case ts.SyntaxKind.AbstractKeyword:
                 sb.appendLine("@abstract"); return;
                 case ts.SyntaxKind.ProtectedKeyword:
