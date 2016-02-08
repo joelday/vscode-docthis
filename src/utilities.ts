@@ -8,8 +8,11 @@ const supportedNodeKinds = [
     ts.SyntaxKind.SetAccessor,
     ts.SyntaxKind.InterfaceDeclaration,
     ts.SyntaxKind.EnumDeclaration,
+    ts.SyntaxKind.EnumMember,
     ts.SyntaxKind.FunctionDeclaration,
     ts.SyntaxKind.MethodDeclaration,
+    ts.SyntaxKind.MethodSignature,
+    ts.SyntaxKind.PropertySignature,
     ts.SyntaxKind.Constructor ];
 
 export function fixWinPath(filePath: string) {

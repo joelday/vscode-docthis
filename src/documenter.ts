@@ -122,6 +122,7 @@ export class Documenter implements vs.Disposable {
                 this._emitClassDeclaration(sb, <ts.ClassDeclaration>node);
                 break;
             case ts.SyntaxKind.PropertyDeclaration:
+            case ts.SyntaxKind.PropertySignature:
             case ts.SyntaxKind.GetAccessor:
             case ts.SyntaxKind.SetAccessor:
                 this._emitPropertyDeclaration(sb, <ts.AccessorDeclaration>node);
@@ -132,8 +133,12 @@ export class Documenter implements vs.Disposable {
             case ts.SyntaxKind.EnumDeclaration:
                 this._emitEnumDeclaration(sb, <ts.EnumDeclaration>node);
                 break;
+            case ts.SyntaxKind.EnumMember:
+                sb.appendLine("(description)");
+                break;
             case ts.SyntaxKind.FunctionDeclaration:
             case ts.SyntaxKind.MethodDeclaration:
+            case ts.SyntaxKind.MethodSignature:
                 this._emitMethodDeclaration(sb, <ts.MethodDeclaration>node);
                 break;
             case ts.SyntaxKind.Constructor:
