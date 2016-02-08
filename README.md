@@ -8,14 +8,14 @@ Supports official JSDoc and Closure Compiler tags: @class, @constant, @enum, @ex
 
 # Commands
 ## Document This
-`Windows: Ctrl-D Ctrl-D` | `Mac: Cmd-D Cmd-D`
+`Windows: Ctrl+Alt+D Ctrl+Alt+D` | `Mac: Cmd+Option+D Cmd+Option+D`
 
 Generates documentation for whatever the carat is on or inside of.
 ## Document Everything
-`Windows: Ctrl-D Ctrl-E` | `Mac: Cmd-D Cmd-E`
+`Windows: Ctrl+Alt+D Ctrl+Alt+E` | `Mac: Cmd+Option+D Cmd+Option+E`
 
 Generates documentation for all symbols that are supported by the extension.
 ## Document Everything Visible
-`Windows: Ctrl-D Ctrl-V` | `Mac: Cmd-D Cmd-V`
+`Windows: Ctrl+Alt+D Ctrl+Alt+V` | `Mac: Cmd+Option+D Cmd+Option+V`
 
 Generates documentation for exported, public and protected symbols in the document.
