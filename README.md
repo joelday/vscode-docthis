@@ -19,3 +19,6 @@ Generates documentation for all symbols that are supported by the extension.
 `Windows: Ctrl+Alt+D Ctrl+Alt+V` | `Mac: Cmd+Option+D Cmd+Option+V`
 
 Generates documentation for exported, public and protected symbols in the document.
+
+## Thank you for using Document This!
+<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=7YU9WH4ANAB4Q&amp;lc=US&amp;item_name=Document%20This&amp;item_number=vscode-docthis%20extensions&amp;currency_code=USD&amp;bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted" target="_blank"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" alt="Paypal Donations"></a>
