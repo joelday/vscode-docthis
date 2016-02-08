@@ -145,9 +145,10 @@ export class Documenter implements vs.Disposable {
         sb.appendLine("(description)");
         sb.appendLine();
         
+        this._emitModifiers(sb, node);
+        
         sb.appendLine(`@class ${ node.name.getText() }`)
         
-        this._emitModifiers(sb, node);
         this._emitHeritageClauses(sb, node);
         this._emitTypeParameters(sb, node);
     }
@@ -192,12 +193,18 @@ export class Documenter implements vs.Disposable {
         this._emitTypeParameters(sb, node);
         this._emitParameters(sb, node);
         
-        sb.append("@returns");
-        if (node.type) {
-            sb.append(" " + utils.formatTypeName(node.type.getText()));
+        if (node.getFullText().indexOf("return") !== -1) {
+            /**
+             * TODO: I assume this check will break for named nested functions?
+             * Will test soon.
+             */
+            sb.append("@returns");
+            if (node.type) {
+                sb.append(" " + utils.formatTypeName(node.type.getText()));
+            }
+            
+            sb.appendLine(" (description)");
         }
-        
-        sb.appendLine(" (description)");
     }
     
     private _emitParameters(sb: utils.StringBuilder, node:
