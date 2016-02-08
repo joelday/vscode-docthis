@@ -2,7 +2,7 @@
     "name": "docthis",
     "displayName": "Document This",
     "description": "Automatically generates detailed JSDoc comments in TypeScript and JavaScript files.",
-    "version": "0.1.11",
+    "version": "0.1.13",
     "publisher": "joelday",
     "icon": "images/icon.svg",
     "galleryBanner": {
@@ -42,8 +42,8 @@
             "mac": "cmd+alt+d cmd+alt+e"
         }, {
             "command": "docthis.documentEverythingVisible",
-            "key": "ctrl+d ctrl+v",
-            "mac": "cmd+d cmd+v"
+            "key": "ctrl+alt+d ctrl+alt+v",
+            "mac": "cmd+alt+d cmd+alt+v"
         }]
     },
     "scripts": {
