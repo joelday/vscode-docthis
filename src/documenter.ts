@@ -19,16 +19,16 @@ export class Documenter implements vs.Disposable {
 
     documentThis(editor: vs.TextEditor, edit: vs.TextEditorEdit, commandName: string) {
         const selection = editor.selection;
-        const carat = selection.start;
+        const caret = selection.start;
 
         const sourceFile = this._getSourceFile(editor.document);
         
-        const position = ts.getPositionOfLineAndCharacter(sourceFile, carat.line, carat.character)
+        const position = ts.getPositionOfLineAndCharacter(sourceFile, caret.line, caret.character)
         const node = utils.findChildForPosition(sourceFile, position);
         const documentNode = utils.nodeIsOfKind(node) ? node : utils.findFirstParent(node);
         
         if (!documentNode) {
-            this._showFailureMessage(commandName, "at the current carat position");
+            this._showFailureMessage(commandName, "at the current caret position");
             return;
         }
         
@@ -38,7 +38,7 @@ export class Documenter implements vs.Disposable {
         if (docLocation) {
             this._insertDocumentation(sb, docLocation, editor, edit, sourceFile);
         } else {
-            this._showFailureMessage(commandName, "at the current carat position");
+            this._showFailureMessage(commandName, "at the current caret position");
         }
     }
     

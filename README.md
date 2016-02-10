@@ -10,7 +10,7 @@ Supports official JSDoc and Closure Compiler tags: @class, @constant, @enum, @ex
 ## Document This
 `Windows: Ctrl+Alt+D Ctrl+Alt+D` | `Mac: Cmd+Option+D Cmd+Option+D`
 
-Generates documentation for whatever the carat is on or inside of.
+Generates documentation for whatever the caret is on or inside of.
 ## Document Everything
 `Windows: Ctrl+Alt+D Ctrl+Alt+E` | `Mac: Cmd+Option+D Cmd+Option+E`
 
