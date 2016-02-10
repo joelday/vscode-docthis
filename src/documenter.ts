@@ -18,10 +18,6 @@ export class Documenter implements vs.Disposable {
     }
 
     documentThis(editor: vs.TextEditor, edit: vs.TextEditorEdit, commandName: string) {
-        if (!this._checkLanguageSupport(editor.document, commandName)) {
-            return;
-        }
-
         const selection = editor.selection;
         const carat = selection.start;
 
@@ -47,10 +43,6 @@ export class Documenter implements vs.Disposable {
     }
     
     documentEverything(editor: vs.TextEditor, edit: vs.TextEditorEdit, visibleOnly: boolean, commandName: string) {
-        if (!this._checkLanguageSupport(editor.document, commandName)) {
-            return;
-        }
-        
         let sourceFile = this._getSourceFile(editor.document);
         const documentable = visibleOnly ? utils.findVisibleChildrenOfKind(sourceFile) : utils.findChildrenOfKind(sourceFile);
         
@@ -76,16 +68,6 @@ export class Documenter implements vs.Disposable {
     
     private _showFailureMessage(commandName: string, condition: string) {
         vs.window.showErrorMessage(`Sorry! '${commandName}' wasn't able to produce documentation ${condition}.`);
-    }
-    
-    private _checkLanguageSupport(document: vs.TextDocument, commandName: string) {
-        if (document.languageId !== "javascript" &&
-            document.languageId !== "typescript") {
-                vs.window.showWarningMessage(`Sorry! '${commandName}' currently supports JavaScript and TypeScript only.`);
-                return false;
-            }
-            
-        return true;
     }
     
     private _insertDocumentation(sb: utils.StringBuilder, position: ts.LineAndCharacter, editor: vs.TextEditor, edit: vs.TextEditorEdit, sourceFile: ts.SourceFile) {
@@ -296,7 +278,15 @@ export class Documenter implements vs.Disposable {
             const heritageType = clause.token === ts.SyntaxKind.ExtendsKeyword ? "@extends" : "@implements";
             
             clause.types.forEach(t => {
-                sb.appendLine(`${ heritageType } ${ utils.formatTypeName(t.expression.getText()) }`);
+                let tn = t.expression.getText();
+                if (t.typeArguments) {
+                    tn += "<";
+                    tn += t.typeArguments.map(a => a.getText()).join(", ");
+                    tn += ">";
+                }
+                
+                sb.append(`${ heritageType } ${ utils.formatTypeName(tn) }`);
+                sb.appendLine();
             });
         });
     }
