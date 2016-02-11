@@ -10,17 +10,17 @@ export class LanguageServiceHost implements ts.LanguageServiceHost {
     private _editorFileSnapshot: ts.IScriptSnapshot;
     private _fileNames: string[];
     private _files: ts.Map<{ text: string; version: number; }>;
-    
+
     constructor() {
         this._fileNames = [];
         this._files = {};
     }
-    
+
     setCurrentFile(fileName: string, fileText: string) {
         for (let fileName in this._files) {
             delete this._files[fileName].text;
         }
-        
+
         if (this._files[fileName]) {
             this._files[fileName].version++;
             this._files[fileName].text = fileText;
@@ -33,7 +33,7 @@ export class LanguageServiceHost implements ts.LanguageServiceHost {
     getScriptFileNames() {
         return this._fileNames;
     }
-    
+
     getScriptVersion(fileName: string) {
         return this._files[fileName] && this._files[fileName].version.toString();
     }
@@ -44,9 +44,9 @@ export class LanguageServiceHost implements ts.LanguageServiceHost {
 
     getCurrentDirectory() {
         return vs.workspace.rootPath ?
-            utils.fixWinPath(path.resolve(vs.workspace.rootPath)) : process.cwd()
+            utils.fixWinPath(path.resolve(vs.workspace.rootPath)) : process.cwd();
     }
-    
+
     getDefaultLibFileName(options: ts.CompilerOptions) {
         return ts.getDefaultLibFilePath(options);
     }

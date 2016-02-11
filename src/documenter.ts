@@ -8,12 +8,12 @@ export class Documenter implements vs.Disposable {
     private _languageServiceHost: LanguageServiceHost;
     private _services: ts.LanguageService;
     private _program: ts.Program;
-    
+
     constructor() {
         this._languageServiceHost = new LanguageServiceHost();
         this._services = ts.createLanguageService(
             this._languageServiceHost, ts.createDocumentRegistry());
-            
+
         this._program = this._services.getProgram();
     }
 
@@ -22,18 +22,18 @@ export class Documenter implements vs.Disposable {
         const caret = selection.start;
 
         const sourceFile = this._getSourceFile(editor.document);
-        
-        const position = ts.getPositionOfLineAndCharacter(sourceFile, caret.line, caret.character)
+
+        const position = ts.getPositionOfLineAndCharacter(sourceFile, caret.line, caret.character);
         const node = utils.findChildForPosition(sourceFile, position);
         const documentNode = utils.nodeIsOfKind(node) ? node : utils.findFirstParent(node);
-        
+
         if (!documentNode) {
             this._showFailureMessage(commandName, "at the current caret position");
             return;
         }
-        
+
         const sb = new utils.StringBuilder();
-        
+
         const docLocation = this._documentNode(sb, documentNode, editor, sourceFile);
         if (docLocation) {
             this._insertDocumentation(sb, docLocation, editor, edit, sourceFile);
@@ -41,13 +41,13 @@ export class Documenter implements vs.Disposable {
             this._showFailureMessage(commandName, "at the current caret position");
         }
     }
-    
+
     documentEverything(editor: vs.TextEditor, edit: vs.TextEditorEdit, visibleOnly: boolean, commandName: string) {
         let sourceFile = this._getSourceFile(editor.document);
         const documentable = visibleOnly ? utils.findVisibleChildrenOfKind(sourceFile) : utils.findChildrenOfKind(sourceFile);
-        
+
         let showFailure = false;
-        
+
         documentable.forEach(node => {
             const sb = new utils.StringBuilder();
 
@@ -57,30 +57,30 @@ export class Documenter implements vs.Disposable {
             } else {
                 showFailure = true;
             }
-            
+
             sourceFile = this._getSourceFile(editor.document);
         });
-        
+
         if (showFailure) {
             this._showFailureMessage(commandName, "for everything in the document");
         }
     }
-    
+
     private _showFailureMessage(commandName: string, condition: string) {
         vs.window.showErrorMessage(`Sorry! '${commandName}' wasn't able to produce documentation ${condition}.`);
     }
-    
+
     private _insertDocumentation(sb: utils.StringBuilder, position: ts.LineAndCharacter, editor: vs.TextEditor, edit: vs.TextEditorEdit, sourceFile: ts.SourceFile) {
         const location = new vs.Position(position.line, position.character);
         const indentStartLocation = new vs.Position(position.line, 0);
-        
+
         const indent = editor.document.getText(new vs.Range(
              indentStartLocation,
              location
         ));
 
         edit.insert(location, sb.toCommentString(indent));
-        
+
         const newText = editor.document.getText();
         sourceFile.update(newText, <ts.TextChangeRange>{
             newLength: newText.length,
@@ -90,14 +90,14 @@ export class Documenter implements vs.Disposable {
             }
         });
     }
-    
+
     private _getSourceFile(document: vs.TextDocument) {
         const fileName = utils.fixWinPath(document.fileName);
         const fileText = document.getText();
         this._languageServiceHost.setCurrentFile(fileName, fileText);
         return this._services.getSourceFile(fileName);
     }
-    
+
     private _documentNode(sb: utils.StringBuilder, node: ts.Node, editor: vs.TextEditor, sourceFile: ts.SourceFile) {
         switch (node.kind) {
             case ts.SyntaxKind.ClassDeclaration:
@@ -129,88 +129,88 @@ export class Documenter implements vs.Disposable {
             default:
                 return;
         }
-        
+
         return ts.getLineAndCharacterOfPosition(sourceFile, node.getStart());
     }
 
     private _emitClassDeclaration(sb: utils.StringBuilder, node: ts.ClassDeclaration) {
         sb.appendLine("(description)");
         sb.appendLine();
-        
+
         this._emitModifiers(sb, node);
-        
-        sb.appendLine(`@class ${ node.name.getText() }`)
-        
+
+        sb.appendLine(`@class ${ node.name.getText() }`);
+
         this._emitHeritageClauses(sb, node);
         this._emitTypeParameters(sb, node);
     }
-    
+
     private _emitPropertyDeclaration(sb: utils.StringBuilder, node: ts.PropertyDeclaration | ts.AccessorDeclaration) {
         sb.appendLine("(description)");
         sb.appendLine();
-        
+
         this._emitModifiers(sb, node);
-        
+
         if (node.type) {
             sb.append(`@type ${ utils.formatTypeName(node.type.getText()) }`);
         }
     }
-    
+
     private _emitInterfaceDeclaration(sb: utils.StringBuilder, node: ts.InterfaceDeclaration) {
         sb.appendLine("(description)");
         sb.appendLine();
-        
+
         this._emitModifiers(sb, node);
-        
+
         sb.appendLine(`@interface ${ node.name.text }`);
-        
+
         this._emitHeritageClauses(sb, node);
         this._emitTypeParameters(sb, node);
     }
-    
+
     private _emitEnumDeclaration(sb: utils.StringBuilder, node: ts.EnumDeclaration) {
         sb.appendLine("(description)");
         sb.appendLine();
-        
+
         this._emitModifiers(sb, node);
-        
+
         sb.appendLine(`@enum {number}`);
     }
-    
+
     private _emitMethodDeclaration(sb: utils.StringBuilder, node: ts.MethodDeclaration | ts.FunctionDeclaration) {
         sb.appendLine("(description)");
         sb.appendLine();
-        
+
         this._emitModifiers(sb, node);
         this._emitTypeParameters(sb, node);
         this._emitParameters(sb, node);
-        
+
         if (node.getFullText().indexOf("return ") !== -1) {
             /**
              * TODO: Search for return as a child node, stopping at any documentable node.
-             */ 
+             */
             sb.append("@returns");
             if (node.type) {
                 sb.append(" " + utils.formatTypeName(node.type.getText()));
             }
-            
+
             sb.appendLine(" (description)");
         }
     }
-    
+
     private _emitParameters(sb: utils.StringBuilder, node:
         ts.MethodDeclaration | ts.FunctionDeclaration | ts.ConstructorDeclaration) {
-            
+
         if (!node.parameters) return;
-        
+
         node.parameters.forEach(parameter => {
             const name = parameter.name.getText();
             const isOptional = parameter.questionToken || parameter.initializer;
             const isArgs = !!parameter.dotDotDotToken;
             const initializerValue = parameter.initializer ? parameter.initializer.getText() : null;
-            
+
             let typeName = null;
-            
+
             if (parameter.initializer && !parameter.type) {
                 // TODO: Avoid false positives on type detection.
                 if (/^[0-9]/.test(initializerValue)) {
@@ -231,21 +231,21 @@ export class Documenter implements vs.Disposable {
             }
 
             sb.append("@param ");
-            
+
             if (typeName) {
                 sb.append(typeName + " ");
             }
-            
+
             if (isOptional) {
                 sb.append("[");
             }
-            
+
             sb.append(name);
-            
+
             if (parameter.initializer && typeName) {
                 sb.append("=" + parameter.initializer.getText());
             }
-            
+
             if (isOptional) {
                 sb.append("]");
             }
@@ -253,30 +253,30 @@ export class Documenter implements vs.Disposable {
             sb.appendLine(" (description)");
         });
     }
-    
+
     private _emitConstructorDeclaration(sb: utils.StringBuilder, node: ts.ConstructorDeclaration) {
         sb.appendLine(`Creates an instance of ${
             (<ts.ClassDeclaration>node.parent).name.getText()
         }.`);
         sb.appendLine();
-        
+
         this._emitParameters(sb, node);
     }
 
     private _emitTypeParameters(sb: utils.StringBuilder, node: ts.ClassLikeDeclaration | ts.InterfaceDeclaration | ts.MethodDeclaration | ts.FunctionDeclaration) {
         if (!node.typeParameters) return;
-        
+
         node.typeParameters.forEach(parameter => {
             sb.appendLine(`@template ${ parameter.name.getText() }`);
         });
     }
-    
+
     private _emitHeritageClauses(sb: utils.StringBuilder, node: ts.ClassLikeDeclaration | ts.InterfaceDeclaration) {
         if (!node.heritageClauses) return;
-        
+
         node.heritageClauses.forEach((clause) => {
             const heritageType = clause.token === ts.SyntaxKind.ExtendsKeyword ? "@extends" : "@implements";
-            
+
             clause.types.forEach(t => {
                 let tn = t.expression.getText();
                 if (t.typeArguments) {
@@ -284,16 +284,16 @@ export class Documenter implements vs.Disposable {
                     tn += t.typeArguments.map(a => a.getText()).join(", ");
                     tn += ">";
                 }
-                
+
                 sb.append(`${ heritageType } ${ utils.formatTypeName(tn) }`);
                 sb.appendLine();
             });
         });
     }
-    
+
     private _emitModifiers(sb: utils.StringBuilder, node: ts.Node) {
         if (!node.modifiers) return;
-        
+
         node.modifiers.forEach(modifier => {
             switch (modifier.kind) {
                 case ts.SyntaxKind.ExportKeyword:
@@ -309,9 +309,8 @@ export class Documenter implements vs.Disposable {
             }
         });
     }
-    
+
     dispose() {
         this._services.dispose();
     }
 }
-        

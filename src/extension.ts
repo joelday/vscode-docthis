@@ -20,7 +20,7 @@ function verifyLanguageSupport(document: vs.TextDocument, commandName: string) {
             vs.window.showWarningMessage(`Sorry! '${commandName}' currently supports JavaScript and TypeScript only.`);
             return false;
         }
-        
+
     return true;
 }
 
@@ -30,7 +30,7 @@ function reportError(error: Error, action: string) {
             const sb = new StringBuilder();
             sb.appendLine("Platform: " + process.platform);
             sb.appendLine();
-            sb.appendLine("Exception:")
+            sb.appendLine("Exception:");
             sb.appendLine(serializeError(error));
 
             const uri = `https://github.com/joelday/vscode-docthis/issues/new?title=${
@@ -38,7 +38,7 @@ function reportError(error: Error, action: string) {
             }&body=${
                 encodeURIComponent(sb.toString())
             }`;
-            
+
             if (process.platform !== "win32") {
                 openurl.open(uri, openErr => { console.error("Failed to launch browser", openErr); });
             } else {
@@ -59,7 +59,7 @@ function runCommand(commandName: string, document: vs.TextDocument, implFunc: ()
     if (!verifyLanguageSupport(document, commandName)) {
         return;
     }
-    
+
     try {
         lazyInitializeDocumenter();
         implFunc();
@@ -72,23 +72,23 @@ function runCommand(commandName: string, document: vs.TextDocument, implFunc: ()
 export function activate(context: vs.ExtensionContext): void {
     context.subscriptions.push(vs.commands.registerTextEditorCommand("docthis.documentThis", (editor, edit) => {
         const commandName = "Document This";
-        
+
         runCommand(commandName, editor.document, () => {
             documenter.documentThis(editor, edit, commandName);
         });
     }));
-    
+
     context.subscriptions.push(vs.commands.registerTextEditorCommand("docthis.documentEverything", (editor, edit) => {
         const commandName = "Document Everything";
-        
+
         runCommand(commandName, editor.document, () => {
             documenter.documentEverything(editor, edit, false, commandName);
         });
     }));
-    
+
     context.subscriptions.push(vs.commands.registerTextEditorCommand("docthis.documentEverythingVisible", (editor, edit) => {
         const commandName = "Document Everything Visible";
-        
+
         runCommand(commandName, editor.document, () => {
             documenter.documentEverything(editor, edit, true, commandName);
         });
