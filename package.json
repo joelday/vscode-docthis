@@ -28,9 +28,12 @@
         }, {
             "command": "docthis.documentEverything",
             "title": "Document Everything"
-        },  {
+        }, {
             "command": "docthis.documentEverythingVisible",
             "title": "Document Everything Visible"
+        }, {
+            "command": "docthis.traceTypeScriptSyntaxNode",
+            "title": "Trace TypeScript Syntax Node"
         }],
         "keybindings": [{
             "command": "docthis.documentThis",

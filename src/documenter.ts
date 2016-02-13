@@ -9,6 +9,8 @@ export class Documenter implements vs.Disposable {
     private _services: ts.LanguageService;
     private _program: ts.Program;
     
+    private _outputChannel: vs.OutputChannel;
+    
     constructor() {
         this._languageServiceHost = new LanguageServiceHost();
         this._services = ts.createLanguageService(
@@ -74,6 +76,54 @@ export class Documenter implements vs.Disposable {
         }
     }
     
+    traceNode(editor: vs.TextEditor, edit: vs.TextEditorEdit) {
+        if (!this._checkLanguageSupport(editor.document, "Trace TypeScript Syntax Node")) {
+            return;
+        }
+
+        const selection = editor.selection;
+        const carat = selection.start;
+
+        const sourceFile = this._getSourceFile(editor.document);
+        
+        const position = ts.getPositionOfLineAndCharacter(sourceFile, carat.line, carat.character);
+        const node = utils.findChildForPosition(sourceFile, position);
+        
+        const nodes: string[] = [];
+        
+        let parent = node;
+        while (parent) {
+            nodes.push(this._printNodeInfo(parent, sourceFile));
+            parent = parent.parent;
+        }
+        
+        const sb = new utils.StringBuilder();
+        nodes.reverse().forEach(n => {
+            sb.appendLine(n);
+        });
+        
+        if (!this._outputChannel) {
+            this._outputChannel = vs.window.createOutputChannel("Syntax Node Trace");
+        }
+        
+        this._outputChannel.show();
+        this._outputChannel.appendLine(sb.toString());
+    }
+    
+    private _printNodeInfo(node: ts.Node, sourceFile: ts.SourceFile) {
+        const sb = new utils.StringBuilder();
+        sb.appendLine(`${ node.getStart() } to ${ node.getEnd() } --- (${node.kind}) ${ (<any>ts).SyntaxKind[node.kind] }`);
+        
+        const column = sourceFile.getLineAndCharacterOfPosition(node.getStart()).character;
+        for (let i = 0; i < column; i++) {
+            sb.append(" ");
+        }
+        
+        sb.appendLine(node.getText());
+        
+        return sb.toString();
+    }
+
     private _showFailureMessage(commandName: string, condition: string) {
         vs.window.showErrorMessage(`Sorry! '${commandName}' wasn't able to produce documentation ${condition}.`);
     }
@@ -320,6 +370,10 @@ export class Documenter implements vs.Disposable {
     }
     
     dispose() {
+        if (this._outputChannel) {
+            this._outputChannel.dispose();
+        }
+        
         this._services.dispose();
     }
 }

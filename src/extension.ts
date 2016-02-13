@@ -34,4 +34,14 @@ export function activate(context: vs.ExtensionContext): void {
             vs.window.showErrorMessage(`Sorry! 'Document Everything Visible' encountered an error: ${e.toString()}.`);
         }
     }));
+    
+    context.subscriptions.push(vs.commands.registerTextEditorCommand("docthis.traceTypeScriptSyntaxNode", (editor, edit) => {
+        try {
+            documenter.traceNode(editor, edit);
+        }
+        catch (e) {
+            console.error(e);
+            vs.window.showErrorMessage(`Sorry! 'Trace TypeScript Syntax Node' encountered an error: ${e.toString()}.`);
+        }
+    }));
 }
