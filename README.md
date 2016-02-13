@@ -20,14 +20,22 @@ Generates documentation for all symbols that are supported by the extension.
 
 Generates documentation for exported, public and protected symbols in the document.
 
+## Trace TypeScript Syntax Node
+`Ctrl+Alt+D Ctrl+Alt+V`
+
+Prints info about the node ancestry at a given caret position.
+
 ## Thank you for using Document This!
 [![Paypal Donations](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=7YU9WH4ANAB4Q&amp;lc=US&amp;item_name=Document%20This&amp;item_number=vscode-docthis%20extension&amp;currency_code=USD&amp;bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted)
 
 ## Changes
 
+### 0.2.1
+- Add @returns whenever there is an explicit return type other than void.
+
 ### 0.2.0
 - Support for documenting function expressions in assignment to properties or variables.
-- A new "Trace TypeScript Syntax Node" command that prints the ancestry of a node at a given caret position.
+- A new "Trace TypeScript Syntax Node" command that prints info about the node ancestry at a given caret position.
 - Resolving Mac system key binding collision.
 
 ### 0.1.16

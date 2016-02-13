@@ -258,10 +258,10 @@ export class Documenter implements vs.Disposable {
     }
 
     private _emitReturns(sb: utils.StringBuilder, node: ts.MethodDeclaration | ts.FunctionDeclaration | ts.FunctionExpression) {
-        if (node.getFullText().indexOf("return ") !== -1) {
-            /**
-             * TODO: Search for return as a child node, stopping at any documentable node.
-             */
+        /**
+         * TODO: Search for return as a child node within the current function scope.
+         */
+        if (node.getFullText().indexOf("return ") !== -1 || (node.type && node.type.getText() !== "void")) {
             sb.append("@returns");
             if (node.type) {
                 sb.append(" " + utils.formatTypeName(node.type.getText()));
