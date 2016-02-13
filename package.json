@@ -1,70 +1,80 @@
 {
-    "name": "docthis",
-    "displayName": "Document This",
-    "description": "Automatically generates detailed JSDoc comments in TypeScript and JavaScript files.",
-    "version": "0.1.9",
-    "publisher": "joelday",
-    "icon": "images/icon.svg",
-    "galleryBanner": {
-        "color": "#252627",
-        "theme": "dark"
-    },
-    "licenseUrl": "LICENSE",
-    "engines": {
-        "vscode": "^0.10.6"
-    },
-    "categories": [
-        "Other", "Snippets", "Languages"
+  "name": "docthis",
+  "displayName": "Document This",
+  "description": "Automatically generates detailed JSDoc comments in TypeScript and JavaScript files.",
+  "version": "0.1.16",
+  "publisher": "joelday",
+  "icon": "images/icon.svg",
+  "galleryBanner": {
+    "color": "#252627",
+    "theme": "dark"
+  },
+  "licenseUrl": "LICENSE",
+  "engines": {
+    "vscode": "^0.10.6"
+  },
+  "categories": [
+    "Other",
+    "Snippets",
+    "Languages"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "main": "./out/src/extension",
+  "contributes": {
+    "commands": [
+      {
+        "command": "docthis.documentThis",
+        "title": "Document This"
+      },
+      {
+        "command": "docthis.documentEverything",
+        "title": "Document Everything"
+      },
+      {
+        "command": "docthis.documentEverythingVisible",
+        "title": "Document Everything Visible"
+      },
+      {
+        "command": "docthis.traceTypeScriptSyntaxNode",
+        "title": "Trace TypeScript Syntax Node"
+      }
     ],
-    "activationEvents": [
-        "onLanguage:javascript",
-        "onLanguage:typescript"
-    ],
-    "main": "./out/src/extension",
-    "contributes": {
-        "commands": [{
-            "command": "docthis.documentThis",
-            "title": "Document This"
-        }, {
-            "command": "docthis.documentEverything",
-            "title": "Document Everything"
-        }, {
-            "command": "docthis.documentEverythingVisible",
-            "title": "Document Everything Visible"
-        }, {
-            "command": "docthis.traceTypeScriptSyntaxNode",
-            "title": "Trace TypeScript Syntax Node"
-        }],
-        "keybindings": [{
-            "command": "docthis.documentThis",
-            "key": "ctrl+d ctrl+d",
-            "mac": "cmd+d cmd+d"
-        }, {
-            "command": "docthis.documentEverything",
-            "key": "ctrl+d ctrl+e",
-            "mac": "cmd+d cmd+e"
-        }, {
-            "command": "docthis.documentEverythingVisible",
-            "key": "ctrl+d ctrl+v",
-            "mac": "cmd+d cmd+v"
-        }]
-    },
-    "scripts": {
-        "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
-        "compile": "node ./node_modules/vscode/bin/compile -watch -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install"
-    },
-    "devDependencies": {
-        "vscode": "^0.11.0"
-    },
-    "dependencies": {
-        "typescript": "^1.7.5"
-    },
-    "bugs": {
-        "url": "https://github.com/joelday/vscode-docthis/issues"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/joelday/vscode-docthis"
-    }
+    "keybindings": [
+      {
+        "command": "docthis.documentThis",
+        "key": "ctrl+alt+d ctrl+alt+d"
+      },
+      {
+        "command": "docthis.documentEverything",
+        "key": "ctrl+alt+d ctrl+alt+e"
+      },
+      {
+        "command": "docthis.documentEverythingVisible",
+        "key": "ctrl+alt+d ctrl+alt+v"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
+    "compile": "node ./node_modules/vscode/bin/compile -watch -p ./",
+    "postinstall": "node ./node_modules/vscode/bin/install"
+  },
+  "devDependencies": {
+    "tslint": "^3.3.0",
+    "vscode": "^0.11.0"
+  },
+  "dependencies": {
+    "openurl": "^1.1.1",
+    "serialize-error": "^1.1.0",
+    "typescript": "^1.7.5"
+  },
+  "bugs": {
+    "url": "https://github.com/joelday/vscode-docthis/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joelday/vscode-docthis"
+  }
 }

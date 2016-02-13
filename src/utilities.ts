@@ -13,61 +13,62 @@ const supportedNodeKinds = [
     ts.SyntaxKind.MethodDeclaration,
     ts.SyntaxKind.MethodSignature,
     ts.SyntaxKind.PropertySignature,
-    ts.SyntaxKind.Constructor ];
+    ts.SyntaxKind.Constructor,
+    ts.SyntaxKind.FunctionExpression];
 
 export function fixWinPath(filePath: string) {
     if (path.sep === "\\") {
         return filePath.replace(/\\/g, "/");
     }
-    
+
     return filePath;
 }
 
 export function findChildForPosition(node: ts.Node, position: number): ts.Node {
     let lastMatchingNode: ts.Node;
-    
+
     const findChildFunc = (n: ts.Node) => {
         const start = n.pos;
         const end = n.end;
-        
+
         if (start > position) {
             return;
         }
-        
+
         if (start <= position && end >= position) {
             lastMatchingNode = n;
         }
-        
+
         n.getChildren().forEach(findChildFunc);
     };
-    
+
     findChildFunc(node);
-    
+
     return lastMatchingNode;
 }
 
 export function findChildrenOfKind(node: ts.Node, kinds = supportedNodeKinds) {
     let children: ts.Node[] = [];
-    
+
     node.getChildren().forEach(c => {
         if (nodeIsOfKind(c, kinds)) {
             children.push(c);
         }
-        
+
         children = children.concat(findChildrenOfKind(c, kinds));
     });
-    
+
     return children;
 }
 
 export function findVisibleChildrenOfKind(node: ts.Node, kinds = supportedNodeKinds) {
     let children = findChildrenOfKind(node, supportedNodeKinds);
-    
+
     return children.filter(child => {
         if (child.modifiers && child.modifiers.find(m => m.kind === ts.SyntaxKind.PrivateKeyword)) {
             return false;
         }
-        
+
         if (child.kind === ts.SyntaxKind.ClassDeclaration ||
             child.kind === ts.SyntaxKind.InterfaceDeclaration ||
             child.kind === ts.SyntaxKind.FunctionDeclaration) {
@@ -75,7 +76,7 @@ export function findVisibleChildrenOfKind(node: ts.Node, kinds = supportedNodeKi
                     return false;
                 }
             }
-         
+
         return true;
     });
 }
@@ -90,59 +91,59 @@ export function findFirstParent(node: ts.Node, kinds = supportedNodeKinds) {
         if (nodeIsOfKind(parent, kinds)) {
             return parent;
         }
-        
+
         parent = parent.parent;
     }
-    
+
     return null;
 }
 
 export class StringBuilder {
     private _text = "";
-    
+
     append(text = "") {
         this._text += text;
     }
-    
+
     appendLine(text = "") {
         this._text += text + "\n";
     }
-    
+
     toString() {
         return this._text;
     }
-    
+
     toCommentString(indent = "") {
         let sb = new StringBuilder();
-        
+
         sb.appendLine("/**");
-        
+
         this._text.trim().split("\n").forEach((line) => {
             sb.append(indent + " * ");
             sb.appendLine(line);
         });
-        
+
         sb.appendLine(indent + " */");
         sb.append(indent);
-        
+
         return sb.toString();
     }
 }
 
 export function formatTypeName(typeName: string) {
     typeName = typeName.trim();
-    
+
     if (typeName === "") {
         return null;
     }
-    
+
     if (typeName === "any") {
         return "{*}";
     }
-    
+
     if (typeName.indexOf("|") !== -1 || typeName.indexOf("&") !== -1) {
         typeName = "(" + typeName + ")";
     }
-    
+
     return "{" + typeName + "}";
 }
