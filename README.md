@@ -4,7 +4,7 @@
 ![Demo](images/demo.gif)
 
 # Functionality
-Supports official JSDoc and Closure Compiler tags: @class, @constant, @enum, @export, @function, @implements, @interface, @param, @private, @returns, @static, @template and @type.
+Supports official JSDoc and Closure Compiler tags: @class, @enum, @export, @function, @implements, @interface, @param, @private, @returns, @static, @template and @type.
 
 # Commands
 ## Document This
@@ -29,6 +29,9 @@ Prints info about the node ancestry at a given caret position.
 [![Paypal Donations](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=7YU9WH4ANAB4Q&amp;lc=US&amp;item_name=Document%20This&amp;item_number=vscode-docthis%20extension&amp;currency_code=USD&amp;bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted)
 
 ## Changes
+### 0.2.2
+- Fixes issue where nested functions caused @returns to be added to void returning parents.
+- Arrow functions were being ignored in various cases.
 
 ### 0.2.1
 - Add @returns whenever there is an explicit return type other than void.

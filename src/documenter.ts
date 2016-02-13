@@ -173,6 +173,7 @@ export class Documenter implements vs.Disposable {
                 this._emitConstructorDeclaration(sb, <ts.ConstructorDeclaration>node);
                 break;
             case ts.SyntaxKind.FunctionExpression:
+            case ts.SyntaxKind.ArrowFunction:
                 return this._emitFunctionExpression(sb, <ts.FunctionExpression>node, sourceFile);
             default:
                 return;
@@ -181,7 +182,7 @@ export class Documenter implements vs.Disposable {
         return ts.getLineAndCharacterOfPosition(sourceFile, node.getStart());
     }
 
-    private _emitFunctionExpression(sb: utils.StringBuilder, node: ts.FunctionExpression, sourceFile: ts.SourceFile) {
+    private _emitFunctionExpression(sb: utils.StringBuilder, node: ts.FunctionExpression | ts.ArrowFunction, sourceFile: ts.SourceFile) {
         let targetNode = node.parent;
 
         if (node.parent.kind !== ts.SyntaxKind.PropertyAssignment &&
@@ -257,11 +258,8 @@ export class Documenter implements vs.Disposable {
         this._emitReturns(sb, node);
     }
 
-    private _emitReturns(sb: utils.StringBuilder, node: ts.MethodDeclaration | ts.FunctionDeclaration | ts.FunctionExpression) {
-        /**
-         * TODO: Search for return as a child node within the current function scope.
-         */
-        if (node.getFullText().indexOf("return ") !== -1 || (node.type && node.type.getText() !== "void")) {
+    private _emitReturns(sb: utils.StringBuilder, node: ts.MethodDeclaration | ts.FunctionDeclaration | ts.FunctionExpression | ts.ArrowFunction) {
+        if (utils.findNonVoidReturnInCurrentScope(node) || (node.type && node.type.getText() !== "void")) {
             sb.append("@returns");
             if (node.type) {
                 sb.append(" " + utils.formatTypeName(node.type.getText()));
@@ -272,7 +270,7 @@ export class Documenter implements vs.Disposable {
     }
 
     private _emitParameters(sb: utils.StringBuilder, node:
-        ts.MethodDeclaration | ts.FunctionDeclaration | ts.ConstructorDeclaration | ts.FunctionExpression) {
+        ts.MethodDeclaration | ts.FunctionDeclaration | ts.ConstructorDeclaration | ts.FunctionExpression | ts.ArrowFunction) {
 
         if (!node.parameters) return;
 
@@ -285,7 +283,6 @@ export class Documenter implements vs.Disposable {
             let typeName = null;
 
             if (parameter.initializer && !parameter.type) {
-                // TODO: Avoid false positives on type detection.
                 if (/^[0-9]/.test(initializerValue)) {
                     typeName = "{number}";
                 }
@@ -336,7 +333,7 @@ export class Documenter implements vs.Disposable {
         this._emitParameters(sb, node);
     }
 
-    private _emitTypeParameters(sb: utils.StringBuilder, node: ts.ClassLikeDeclaration | ts.InterfaceDeclaration | ts.MethodDeclaration | ts.FunctionDeclaration | ts.FunctionExpression) {
+    private _emitTypeParameters(sb: utils.StringBuilder, node: ts.ClassLikeDeclaration | ts.InterfaceDeclaration | ts.MethodDeclaration | ts.FunctionDeclaration | ts.FunctionExpression | ts.ArrowFunction) {
         if (!node.typeParameters) return;
 
         node.typeParameters.forEach(parameter => {

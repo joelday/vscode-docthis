@@ -10,6 +10,7 @@ const supportedNodeKinds = [
     ts.SyntaxKind.EnumDeclaration,
     ts.SyntaxKind.EnumMember,
     ts.SyntaxKind.FunctionDeclaration,
+    ts.SyntaxKind.ArrowFunction,
     ts.SyntaxKind.MethodDeclaration,
     ts.SyntaxKind.MethodSignature,
     ts.SyntaxKind.PropertySignature,
@@ -59,6 +60,33 @@ export function findChildrenOfKind(node: ts.Node, kinds = supportedNodeKinds) {
     });
 
     return children;
+}
+
+export function findNonVoidReturnInCurrentScope(node: ts.Node) {
+    let returnNode: ts.ReturnStatement;
+
+    const children = node.getChildren();
+
+    returnNode = <ts.ReturnStatement>children.find(n => n.kind === ts.SyntaxKind.ReturnStatement);
+
+    if (returnNode) {
+        if (returnNode.getChildren().length > 1) {
+            return returnNode;
+        }
+    }
+
+    for (let child of children) {
+        if (child.kind === ts.SyntaxKind.FunctionDeclaration || child.kind === ts.SyntaxKind.FunctionExpression || child.kind === ts.SyntaxKind.ArrowFunction) {
+            continue;
+        }
+
+        returnNode = findNonVoidReturnInCurrentScope(child);
+        if (returnNode) {
+            return returnNode;
+        }
+    }
+
+    return returnNode;
 }
 
 export function findVisibleChildrenOfKind(node: ts.Node, kinds = supportedNodeKinds) {
