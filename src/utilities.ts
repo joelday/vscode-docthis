@@ -106,7 +106,7 @@ export function findNonVoidReturnInCurrentScope(node: ts.Node) {
 }
 
 export function findVisibleChildrenOfKind(node: ts.Node, kinds = supportedNodeKinds) {
-    let children = findChildrenOfKind(node, supportedNodeKinds);
+    let children = findChildrenOfKind(node, kinds);
 
     return children.filter(child => {
         if (child.modifiers && child.modifiers.find(m => m.kind === ts.SyntaxKind.PrivateKeyword)) {
