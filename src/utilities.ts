@@ -48,6 +48,22 @@ export function findChildForPosition(node: ts.Node, position: number): ts.Node {
     return lastMatchingNode;
 }
 
+export function findFirstChildOfKindDepthFirst(node: ts.Node, kinds = supportedNodeKinds): ts.Node {
+    let children = node.getChildren();
+    for (let c of children) {
+        if (nodeIsOfKind(c, kinds)) {
+            return c;
+        }
+
+        const matching = findFirstChildOfKindDepthFirst(c, kinds);
+        if (matching) {
+            return matching;
+        }
+    }
+
+    return null;
+}
+
 export function findChildrenOfKind(node: ts.Node, kinds = supportedNodeKinds) {
     let children: ts.Node[] = [];
 

@@ -21,14 +21,15 @@ Generates documentation for all symbols that are supported by the extension.
 Generates documentation for exported, public and protected symbols in the document.
 
 ## Trace TypeScript Syntax Node
-`Ctrl+Alt+D Ctrl+Alt+V`
-
 Prints info about the node ancestry at a given caret position.
 
 ## Thank you for using Document This!
 [![Paypal Donations](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=7YU9WH4ANAB4Q&amp;lc=US&amp;item_name=Document%20This&amp;item_number=vscode-docthis%20extension&amp;currency_code=USD&amp;bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted)
 
 ## Changes
+### 0.2.3
+- @readonly is automatically added to property "get" accessors that are not accompanied by a "set" accessor.
+
 ### 0.2.2
 - Fixes issue where nested functions caused @returns to be added to void returning parents.
 - Arrow functions were being ignored in various cases.

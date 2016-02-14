@@ -220,6 +220,18 @@ export class Documenter implements vs.Disposable {
         sb.appendLine("(description)");
         sb.appendLine();
 
+        if (node.kind === ts.SyntaxKind.GetAccessor) {
+            const name = utils.findFirstChildOfKindDepthFirst(node, [ts.SyntaxKind.Identifier]).getText();
+            const parentClass = <ts.ClassDeclaration>node.parent;
+
+            let hasSetter = !!parentClass.members.find(c => c.kind === ts.SyntaxKind.SetAccessor &&
+                utils.findFirstChildOfKindDepthFirst(c, [ts.SyntaxKind.Identifier]).getText() === name);
+
+            if (!hasSetter) {
+                sb.appendLine("@readonly");
+            }
+        }
+
         this._emitModifiers(sb, node);
 
         if (node.type) {
