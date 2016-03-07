@@ -16,7 +16,9 @@ function lazyInitializeDocumenter() {
 
 function verifyLanguageSupport(document: vs.TextDocument, commandName: string) {
     if (document.languageId !== "javascript" &&
-        document.languageId !== "typescript") {
+        document.languageId !== "typescript" &&
+        document.languageId !== "javascriptreact" &&
+        document.languageId !== "typescriptreact") {
             vs.window.showWarningMessage(`Sorry! '${commandName}' currently supports JavaScript and TypeScript only.`);
             return false;
         }
