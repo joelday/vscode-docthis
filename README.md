@@ -8,15 +8,15 @@ Supports official JSDoc and Closure Compiler tags: @class, @enum, @export, @func
 
 # Commands
 ## Document This
-`Ctrl+Alt+D Ctrl+Alt+D`
+`Ctrl+Alt+D` and again `Ctrl+Alt+D`
 
 Generates documentation for whatever the caret is on or inside of.
 ## Document Everything
-`Ctrl+Alt+D Ctrl+Alt+E`
+`Ctrl+Alt+D` and after `Ctrl+Alt+E`
 
 Generates documentation for all symbols that are supported by the extension.
 ## Document Everything Visible
-`Ctrl+Alt+D Ctrl+Alt+V`
+`Ctrl+Alt+D` and after `Ctrl+Alt+V`
 
 Generates documentation for exported, public and protected symbols in the document.
 
