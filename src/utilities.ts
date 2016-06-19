@@ -157,10 +157,12 @@ export class StringBuilder {
         return this._text;
     }
 
-    toCommentString(indent = "") {
+    toCommentString(indent = "", withStart = true) {
         let sb = new StringBuilder();
 
-        sb.appendLine("/**");
+        if (withStart) {
+            sb.appendLine("/**");
+        }
 
         this._text.trim().split("\n").forEach((line) => {
             sb.append(indent + " * ");

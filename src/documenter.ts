@@ -19,6 +19,24 @@ export class Documenter implements vs.Disposable {
         this._program = this._services.getProgram();
     }
 
+    automaticDocument(editor: vs.TextEditor, edit: vs.TextEditorEdit) {
+        const selection = editor.selection;
+        const caret = selection.start;
+
+        const sourceFile = this._getSourceFile(editor.document);
+
+        const position = ts.getPositionOfLineAndCharacter(sourceFile, caret.line, caret.character);
+        const node = utils.findChildForPosition(sourceFile, position);
+        const documentNode = utils.nodeIsOfKind(node) ? node : utils.findFirstParent(node);
+
+        const sb = new utils.StringBuilder();
+
+        const docLocation = this._documentNode(sb, documentNode, editor, sourceFile);
+        if (docLocation) {
+            this._insertDocumentation(sb, docLocation, editor, edit, sourceFile);
+        }
+    }
+
     documentThis(editor: vs.TextEditor, edit: vs.TextEditorEdit, commandName: string) {
         const selection = editor.selection;
         const caret = selection.start;
@@ -116,25 +134,45 @@ export class Documenter implements vs.Disposable {
         vs.window.showErrorMessage(`Sorry! '${commandName}' wasn't able to produce documentation ${condition}.`);
     }
 
-    private _insertDocumentation(sb: utils.StringBuilder, position: ts.LineAndCharacter, editor: vs.TextEditor, edit: vs.TextEditorEdit, sourceFile: ts.SourceFile) {
-        const location = new vs.Position(position.line, position.character);
+    private _insertDocumentation(sb: utils.StringBuilder, position: ts.LineAndCharacter, editor: vs.TextEditor, edit: vs.TextEditorEdit, sourceFile: ts.SourceFile, withStart = true) {
+        let location = new vs.Position(position.line, position.character);
         const indentStartLocation = new vs.Position(position.line, 0);
 
-        const indent = editor.document.getText(new vs.Range(
+        let indentRange = new vs.Range(
              indentStartLocation,
              location
-        ));
+        );
 
-        edit.insert(location, sb.toCommentString(indent));
+        if (!withStart && position.character - 3 >= 0) {
+            const commentStart = editor.document.getText(new vs.Range(
+                new vs.Position(position.line, position.character - 3),
+                location
+            ));
 
-        const newText = editor.document.getText();
-        sourceFile.update(newText, <ts.TextChangeRange>{
-            newLength: newText.length,
-            span: <ts.TextSpan>{
-                start: 0,
-                length: newText.length
+            if (commentStart === "/**") {
+                indentRange = new vs.Range(indentStartLocation, new vs.Position(position.line, position.character - 3));
             }
-        });
+        }
+
+        const indent = editor.document.getText(indentRange);
+        const commentText = sb.toCommentString(indent, withStart);
+        const commentLineCount = commentText.split("\n").length;
+
+        edit.replace(location, commentText);
+
+        setTimeout(() => {
+            const newText = editor.document.getText();
+            sourceFile.update(newText, <ts.TextChangeRange>{
+                newLength: newText.length,
+                span: <ts.TextSpan>{
+                    start: 0,
+                    length: newText.length
+                }
+            });
+
+            let newCaratPosition = location.translate(-commentLineCount + 1, 3);
+            editor.selection = new vs.Selection(newCaratPosition, newCaratPosition);
+        }, 1);
     }
 
     private _getSourceFile(document: vs.TextDocument) {
@@ -234,7 +272,10 @@ export class Documenter implements vs.Disposable {
 
         this._emitModifiers(sb, node);
 
-        if (node.type) {
+        // JSDoc fails to emit documentation for arrow function syntax. (https://github.com/jsdoc3/jsdoc/issues/1100)
+        if (node.type && node.type.getText().indexOf("=>") === -1) {
+            let type = utils.formatTypeName(node.type.getText());
+
             sb.append(`@type ${ utils.formatTypeName(node.type.getText()) }`);
         }
     }
@@ -245,7 +286,7 @@ export class Documenter implements vs.Disposable {
 
         this._emitModifiers(sb, node);
 
-        sb.appendLine(`@interface ${ node.name.text }`);
+        sb.appendLine(`@interface ${ node.name.getText() }`);
 
         this._emitHeritageClauses(sb, node);
         this._emitTypeParameters(sb, node);
@@ -314,9 +355,7 @@ export class Documenter implements vs.Disposable {
 
             sb.append("@param ");
 
-            if (typeName) {
-                sb.append(typeName + " ");
-            }
+            sb.append(typeName + " ");
 
             if (isOptional) {
                 sb.append("[");
