@@ -24,6 +24,14 @@ export class Documenter implements vs.Disposable {
         const caret = selection.start;
 
         const sourceFile = this._getSourceFile(editor.document);
+        const newText = editor.document.getText();
+        sourceFile.update(newText, <ts.TextChangeRange>{
+            newLength: newText.length,
+            span: <ts.TextSpan>{
+                start: 0,
+                length: newText.length
+            }
+        });
 
         const position = ts.getPositionOfLineAndCharacter(sourceFile, caret.line, caret.character);
         const node = utils.findChildForPosition(sourceFile, position);
@@ -31,9 +39,9 @@ export class Documenter implements vs.Disposable {
 
         const sb = new utils.StringBuilder();
 
-        const docLocation = this._documentNode(sb, documentNode, editor, sourceFile);
-        if (docLocation) {
-            this._insertDocumentation(sb, docLocation, editor, edit, sourceFile);
+        const foundLocation = this._documentNode(sb, documentNode, editor, sourceFile);
+        if (foundLocation) {
+            this._insertDocumentation(sb, caret, editor, edit, sourceFile, false);
         }
     }
 
@@ -143,36 +151,39 @@ export class Documenter implements vs.Disposable {
              location
         );
 
-        if (!withStart && position.character - 3 >= 0) {
-            const commentStart = editor.document.getText(new vs.Range(
-                new vs.Position(position.line, position.character - 3),
-                location
-            ));
-
-            if (commentStart === "/**") {
+        if (!withStart) {
+            if (position.character - 3 >= 0) {
                 indentRange = new vs.Range(indentStartLocation, new vs.Position(position.line, position.character - 3));
             }
+
+            const indent = editor.document.getText(indentRange);
+            const commentText = sb.toCommentString(indent, withStart);
+
+            const lines = commentText.split("\n");
+
+            const firstLines = lines.splice(0, 2).join("\n");
+
+            edit.insert(location, firstLines);
+
+            const latterLocation = new vs.Position(position.line, position.character + 1);
+
+            edit.insert(latterLocation, "\n " + lines.join("\n"));
+        }
+        else {
+            const indent = editor.document.getText(indentRange);
+            const commentText = sb.toCommentString(indent, withStart);
+
+            edit.insert(location, commentText);
         }
 
-        const indent = editor.document.getText(indentRange);
-        const commentText = sb.toCommentString(indent, withStart);
-        const commentLineCount = commentText.split("\n").length;
-
-        edit.replace(location, commentText);
-
-        setTimeout(() => {
-            const newText = editor.document.getText();
-            sourceFile.update(newText, <ts.TextChangeRange>{
-                newLength: newText.length,
-                span: <ts.TextSpan>{
-                    start: 0,
-                    length: newText.length
-                }
-            });
-
-            let newCaratPosition = location.translate(-commentLineCount + 1, 3);
-            editor.selection = new vs.Selection(newCaratPosition, newCaratPosition);
-        }, 1);
+        const newText = editor.document.getText();
+        sourceFile.update(newText, <ts.TextChangeRange>{
+            newLength: newText.length,
+            span: <ts.TextSpan>{
+                start: 0,
+                length: newText.length
+            }
+        });
     }
 
     private _getSourceFile(document: vs.TextDocument) {
@@ -200,7 +211,7 @@ export class Documenter implements vs.Disposable {
                 this._emitEnumDeclaration(sb, <ts.EnumDeclaration>node);
                 break;
             case ts.SyntaxKind.EnumMember:
-                sb.appendLine("(description)");
+                sb.appendLine();
                 break;
             case ts.SyntaxKind.FunctionDeclaration:
             case ts.SyntaxKind.MethodDeclaration:
@@ -232,7 +243,7 @@ export class Documenter implements vs.Disposable {
             }
         }
 
-        sb.appendLine("(description)");
+        sb.appendLine();
         sb.appendLine();
 
         this._emitTypeParameters(sb, node);
@@ -243,7 +254,7 @@ export class Documenter implements vs.Disposable {
     }
 
     private _emitClassDeclaration(sb: utils.StringBuilder, node: ts.ClassDeclaration) {
-        sb.appendLine("(description)");
+        sb.appendLine();
         sb.appendLine();
 
         this._emitModifiers(sb, node);
@@ -255,7 +266,7 @@ export class Documenter implements vs.Disposable {
     }
 
     private _emitPropertyDeclaration(sb: utils.StringBuilder, node: ts.PropertyDeclaration | ts.AccessorDeclaration) {
-        sb.appendLine("(description)");
+        sb.appendLine();
         sb.appendLine();
 
         if (node.kind === ts.SyntaxKind.GetAccessor) {
@@ -281,7 +292,7 @@ export class Documenter implements vs.Disposable {
     }
 
     private _emitInterfaceDeclaration(sb: utils.StringBuilder, node: ts.InterfaceDeclaration) {
-        sb.appendLine("(description)");
+        sb.appendLine();
         sb.appendLine();
 
         this._emitModifiers(sb, node);
@@ -293,7 +304,7 @@ export class Documenter implements vs.Disposable {
     }
 
     private _emitEnumDeclaration(sb: utils.StringBuilder, node: ts.EnumDeclaration) {
-        sb.appendLine("(description)");
+        sb.appendLine();
         sb.appendLine();
 
         this._emitModifiers(sb, node);
@@ -302,7 +313,7 @@ export class Documenter implements vs.Disposable {
     }
 
     private _emitMethodDeclaration(sb: utils.StringBuilder, node: ts.MethodDeclaration | ts.FunctionDeclaration) {
-        sb.appendLine("(description)");
+        sb.appendLine();
         sb.appendLine();
 
         this._emitModifiers(sb, node);
@@ -318,7 +329,7 @@ export class Documenter implements vs.Disposable {
                 sb.append(" " + utils.formatTypeName(node.type.getText()));
             }
 
-            sb.appendLine(" (description)");
+            sb.appendLine();
         }
     }
 
@@ -371,7 +382,7 @@ export class Documenter implements vs.Disposable {
                 sb.append("]");
             }
 
-            sb.appendLine(" (description)");
+            sb.appendLine();
         });
     }
 

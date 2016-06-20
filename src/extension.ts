@@ -4,7 +4,7 @@ import * as serializeError from "serialize-error";
 import * as childProcess from "child_process";
 
 import { Documenter } from "./documenter";
-import { StringBuilder } from "./utilities";
+import { StringBuilder, emptyArray } from "./utilities";
 
 let documenter: Documenter;
 
@@ -14,14 +14,18 @@ function lazyInitializeDocumenter() {
     }
 }
 
+function languageIsSupported(document: vs.TextDocument) {
+    return (document.languageId === "javascript" ||
+        document.languageId === "typescript" ||
+        document.languageId === "javascriptreact" ||
+        document.languageId === "typescriptreact");
+}
+
 function verifyLanguageSupport(document: vs.TextDocument, commandName: string) {
-    if (document.languageId !== "javascript" &&
-        document.languageId !== "typescript" &&
-        document.languageId !== "javascriptreact" &&
-        document.languageId !== "typescriptreact") {
-            vs.window.showWarningMessage(`Sorry! '${commandName}' currently supports JavaScript and TypeScript only.`);
-            return false;
-        }
+    if (!languageIsSupported(document)) {
+        vs.window.showWarningMessage(`Sorry! '${commandName}' currently supports JavaScript and TypeScript only.`);
+        return false;
+    }
 
     return true;
 }
@@ -76,6 +80,47 @@ function runCommand(commandName: string, document: vs.TextDocument, implFunc: ()
 }
 
 export function activate(context: vs.ExtensionContext): void {
+    context.subscriptions.push(vs.workspace.onDidChangeTextDocument(e => {
+        if (!languageIsSupported(e.document)) {
+            return;
+        }
+
+        const editor = vs.window.activeTextEditor;
+        if (editor.document !== e.document) {
+            return;
+        }
+
+        const uri = e.document.uri.toString();
+
+        if (e.contentChanges.length > 1) {
+            return;
+        }
+
+        const change = e.contentChanges[0];
+        if (change.text !== "*") {
+            return;
+        }
+
+        const testRange = new vs.Range(
+            new vs.Position(change.range.start.line, change.range.start.character - 2),
+            new vs.Position(change.range.end.line, change.range.end.character + 1)
+        );
+
+        if (e.document.getText(testRange) === "/**") {
+            setTimeout(() => {
+                editor.edit(edit => {
+                    try {
+                        lazyInitializeDocumenter();
+                        documenter.automaticDocument(editor, edit);
+                    }
+                    catch (ex) {
+                        console.error("docthis: Failed to document at current position.");
+                    }
+                });
+            }, 0);
+        }
+    }));
+
     context.subscriptions.push(vs.commands.registerTextEditorCommand("docthis.documentThis", (editor, edit) => {
         const commandName = "Document This";
 

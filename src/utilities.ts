@@ -17,6 +17,12 @@ const supportedNodeKinds = [
     ts.SyntaxKind.Constructor,
     ts.SyntaxKind.FunctionExpression];
 
+export function emptyArray(arr: any[]) {
+    while (arr.length > 0) {
+        arr.pop();
+    }
+}
+
 export function fixWinPath(filePath: string) {
     if (path.sep === "\\") {
         return filePath.replace(/\\/g, "/");
@@ -163,13 +169,30 @@ export class StringBuilder {
         if (withStart) {
             sb.appendLine("/**");
         }
+        else {
+            sb.appendLine();
+        }
 
-        this._text.trim().split("\n").forEach((line) => {
+        const lines = this._text.split("\n");
+        if (lines.every(l => l === "")) {
+            emptyArray(lines);
+            lines.push("");
+            lines.push("");
+        }
+
+        lines.forEach((line, i) => {
+            if (line === "" && i === lines.length - 1) {
+                return;
+            }
+
             sb.append(indent + " * ");
             sb.appendLine(line);
         });
 
-        sb.appendLine(indent + " */");
+        if (withStart) {
+            sb.appendLine(indent + " */");
+        }
+
         sb.append(indent);
 
         return sb.toString();
