@@ -41,6 +41,12 @@ export class Documenter implements vs.Disposable {
 
         const foundLocation = this._documentNode(sb, documentNode, editor, sourceFile);
         if (foundLocation) {
+            const foundLocationOffset = editor.document.offsetAt(new vs.Position(foundLocation.line, foundLocation.character));
+            const caretOffset = editor.document.offsetAt(caret);
+            if (caretOffset > foundLocationOffset) {
+                return;
+            }
+
             this._insertDocumentation(sb, caret, editor, edit, sourceFile, false);
         }
     }
@@ -142,6 +148,7 @@ export class Documenter implements vs.Disposable {
         vs.window.showErrorMessage(`Sorry! '${commandName}' wasn't able to produce documentation ${condition}.`);
     }
 
+    // TODO: This is pretty messy...
     private _insertDocumentation(sb: utils.StringBuilder, position: ts.LineAndCharacter, editor: vs.TextEditor, edit: vs.TextEditorEdit, sourceFile: ts.SourceFile, withStart = true) {
         let location = new vs.Position(position.line, position.character);
         const indentStartLocation = new vs.Position(position.line, 0);
@@ -165,9 +172,9 @@ export class Documenter implements vs.Disposable {
 
             edit.insert(location, firstLines);
 
-            const latterLocation = new vs.Position(position.line, position.character + 1);
+            const latterLocation = new vs.Position(position.line, position.character);
 
-            edit.insert(latterLocation, "\n " + lines.join("\n"));
+            edit.insert(latterLocation, "\n" + lines.join("\n"));
         }
         else {
             const indent = editor.document.getText(indentRange);

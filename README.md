@@ -27,6 +27,10 @@ Prints info about the node ancestry at a given caret position.
 [![Paypal Donations](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=7YU9WH4ANAB4Q&amp;lc=US&amp;item_name=Document%20This&amp;item_number=vscode-docthis%20extension&amp;currency_code=USD&amp;bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted)
 
 ## Changes
+### 0.3.1
+- Fix an indenting issue with '/**' output.
+- No longer inserting '/**' output when caret is inside of the documented symbol.
+
 ### 0.3.0
 - Typing `/**` now automatically attempts a documentation at the typed location.
 - No longer emitting arrow function types. [Blocked by #1100](https://github.com/jsdoc3/jsdoc/issues/1100)

@@ -2,11 +2,11 @@
   "name": "docthis",
   "displayName": "Document This",
   "description": "Automatically generates detailed JSDoc comments in TypeScript and JavaScript files.",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "publisher": "joelday",
   "contributors": [
     "Joel Day <joelday@gmail.com> (https://github.com/joelday)",
-    "Barney Rubble <jamie@outsharked.com> (http://blog.outsharked.com",
+    "Barney Rubble <jamie@outsharked.com> (http://blog.outsharked.com)",
     "Vassilis Pitsounis (http://www.pixelnet.gr)"
   ],
   "icon": "images/icon.svg",
