@@ -81,6 +81,10 @@ function runCommand(commandName: string, document: vs.TextDocument, implFunc: ()
 
 export function activate(context: vs.ExtensionContext): void {
     context.subscriptions.push(vs.workspace.onDidChangeTextDocument(e => {
+        if (!vs.workspace.getConfiguration().get("docthis.automaticForBlockComments", true)) {
+            return;
+        }
+
         if (!languageIsSupported(e.document)) {
             return;
         }
@@ -91,7 +95,6 @@ export function activate(context: vs.ExtensionContext): void {
         }
 
         const uri = e.document.uri.toString();
-
         if (e.contentChanges.length > 1) {
             return;
         }
@@ -103,8 +106,7 @@ export function activate(context: vs.ExtensionContext): void {
 
         const testRange = new vs.Range(
             new vs.Position(change.range.start.line, change.range.start.character - 2),
-            new vs.Position(change.range.end.line, change.range.end.character + 1)
-        );
+            new vs.Position(change.range.end.line, change.range.end.character + 1));
 
         if (e.document.getText(testRange) === "/**") {
             setTimeout(() => {

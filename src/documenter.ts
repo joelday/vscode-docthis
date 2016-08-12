@@ -4,6 +4,10 @@ import * as utils from "./utilities";
 
 import { LanguageServiceHost } from "./languageServiceHost";
 
+function includeTypes() {
+    return vs.workspace.getConfiguration().get("docthis.includeTypes", true);
+}
+
 export class Documenter implements vs.Disposable {
     private _languageServiceHost: LanguageServiceHost;
     private _services: ts.LanguageService;
@@ -183,14 +187,21 @@ export class Documenter implements vs.Disposable {
             edit.insert(location, commentText);
         }
 
-        const newText = editor.document.getText();
-        sourceFile.update(newText, <ts.TextChangeRange>{
-            newLength: newText.length,
-            span: <ts.TextSpan>{
-                start: 0,
-                length: newText.length
+        if (withStart) {
+            const newText = editor.document.getText();
+            try {
+                sourceFile.update(newText, <ts.TextChangeRange>{
+                    newLength: newText.length,
+                    span: <ts.TextSpan>{
+                        start: 0,
+                        length: newText.length
+                    }
+                });
             }
-        });
+            catch (error) {
+                console.warn("Error in source file update:", error);
+            }
+        }
     }
 
     private _getSourceFile(document: vs.TextDocument) {
@@ -291,7 +302,7 @@ export class Documenter implements vs.Disposable {
         this._emitModifiers(sb, node);
 
         // JSDoc fails to emit documentation for arrow function syntax. (https://github.com/jsdoc3/jsdoc/issues/1100)
-        if (node.type && node.type.getText().indexOf("=>") === -1) {
+        if (includeTypes() && node.type && node.type.getText().indexOf("=>") === -1) {
             let type = utils.formatTypeName(node.type.getText());
 
             sb.append(`@type ${ utils.formatTypeName(node.type.getText()) }`);
@@ -332,7 +343,7 @@ export class Documenter implements vs.Disposable {
     private _emitReturns(sb: utils.StringBuilder, node: ts.MethodDeclaration | ts.FunctionDeclaration | ts.FunctionExpression | ts.ArrowFunction) {
         if (utils.findNonVoidReturnInCurrentScope(node) || (node.type && node.type.getText() !== "void")) {
             sb.append("@returns");
-            if (node.type) {
+            if (includeTypes() && node.type) {
                 sb.append(" " + utils.formatTypeName(node.type.getText()));
             }
 
@@ -353,27 +364,31 @@ export class Documenter implements vs.Disposable {
 
             let typeName = "{any}";
 
-            if (parameter.initializer && !parameter.type) {
-                if (/^[0-9]/.test(initializerValue)) {
-                    typeName = "{number}";
+            if (includeTypes()) {
+                if (parameter.initializer && !parameter.type) {
+                    if (/^[0-9]/.test(initializerValue)) {
+                        typeName = "{number}";
+                    }
+                    else if (initializerValue.indexOf("\"") !== -1 ||
+                            initializerValue.indexOf("'") !== -1 ||
+                            initializerValue.indexOf("`") !== -1) {
+                        typeName = "{string}";
+                    }
+                    else if (initializerValue.indexOf("true") !== -1 ||
+                            initializerValue.indexOf("false") !== -1) {
+                        typeName = "{boolean}";
+                    }
                 }
-                else if (initializerValue.indexOf("\"") !== -1 ||
-                         initializerValue.indexOf("'") !== -1 ||
-                         initializerValue.indexOf("`") !== -1) {
-                    typeName = "{string}";
+                else if (parameter.type) {
+                    typeName = utils.formatTypeName((isArgs ? "..." : "") + parameter.type.getFullText().trim());
                 }
-                else if (initializerValue.indexOf("true") !== -1 ||
-                         initializerValue.indexOf("false") !== -1) {
-                    typeName = "{boolean}";
-                }
-            }
-            else if (parameter.type) {
-                typeName = utils.formatTypeName((isArgs ? "..." : "") + parameter.type.getFullText().trim());
             }
 
             sb.append("@param ");
 
-            sb.append(typeName + " ");
+            if (includeTypes()) {
+                sb.append(typeName + " ");
+            }
 
             if (isOptional) {
                 sb.append("[");
@@ -411,7 +426,7 @@ export class Documenter implements vs.Disposable {
     }
 
     private _emitHeritageClauses(sb: utils.StringBuilder, node: ts.ClassLikeDeclaration | ts.InterfaceDeclaration) {
-        if (!node.heritageClauses) return;
+        if (!node.heritageClauses || !includeTypes()) return;
 
         node.heritageClauses.forEach((clause) => {
             const heritageType = clause.token === ts.SyntaxKind.ExtendsKeyword ? "@extends" : "@implements";

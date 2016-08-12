@@ -2,7 +2,7 @@
   "name": "docthis",
   "displayName": "Document This",
   "description": "Automatically generates detailed JSDoc comments in TypeScript and JavaScript files.",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "publisher": "joelday",
   "contributors": [
     "Joel Day <joelday@gmail.com> (https://github.com/joelday)",
@@ -59,7 +59,23 @@
         "command": "docthis.documentEverythingVisible",
         "key": "ctrl+alt+d ctrl+alt+v"
       }
-    ]
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Document This configuration",
+      "properties": {
+        "docthis.automaticForBlockComments": {
+          "type": "boolean",
+          "default": true,
+          "description": "When enabled, typing /** triggers documentation automatically."
+        },
+        "docthis.includeTypes": {
+          "type": "boolean",
+          "default": true,
+          "description": "When enabled, type information is added to comment tags."
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
