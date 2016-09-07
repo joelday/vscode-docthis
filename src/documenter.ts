@@ -51,7 +51,7 @@ export class Documenter implements vs.Disposable {
                 return;
             }
 
-            this._insertDocumentation(sb, caret, editor, edit, sourceFile, false);
+            this._insertDocumentation(sb, caret, editor, edit, sourceFile, false, true);
         }
     }
 
@@ -74,10 +74,20 @@ export class Documenter implements vs.Disposable {
 
         const docLocation = this._documentNode(sb, documentNode, editor, sourceFile);
         if (docLocation) {
-            this._insertDocumentation(sb, docLocation, editor, edit, sourceFile);
+            this._insertDocumentation(sb, docLocation, editor, edit, sourceFile, true, true);
         } else {
             this._showFailureMessage(commandName, "at the current caret position");
         }
+    }
+
+    _goToDescriptionLocation(commentText: string) {
+        let lines = commentText.split('\n');
+        let count = lines.length;
+        let line = vs.window.activeTextEditor.selection.start.line - (count - 2);
+        let character = lines[1].length;
+        let position = new vs.Position(line, character);
+        let selection = new vs.Selection(position, position);
+        vs.window.activeTextEditor.selection = selection;
     }
 
     documentEverything(editor: vs.TextEditor, edit: vs.TextEditorEdit, visibleOnly: boolean, commandName: string) {
@@ -153,7 +163,7 @@ export class Documenter implements vs.Disposable {
     }
 
     // TODO: This is pretty messy...
-    private _insertDocumentation(sb: utils.StringBuilder, position: ts.LineAndCharacter, editor: vs.TextEditor, edit: vs.TextEditorEdit, sourceFile: ts.SourceFile, withStart = true) {
+    private _insertDocumentation(sb: utils.StringBuilder, position: ts.LineAndCharacter, editor: vs.TextEditor, edit: vs.TextEditorEdit, sourceFile: ts.SourceFile, withStart = true, goToDescription = false) {
         let location = new vs.Position(position.line, position.character);
         const indentStartLocation = new vs.Position(position.line, 0);
 
@@ -162,13 +172,14 @@ export class Documenter implements vs.Disposable {
             location
         );
 
+        let commentText: string;
         if (!withStart) {
             if (position.character - 3 >= 0) {
                 indentRange = new vs.Range(indentStartLocation, new vs.Position(position.line, position.character - 3));
             }
 
             const indent = editor.document.getText(indentRange);
-            const commentText = sb.toCommentString(indent, withStart);
+            commentText = sb.toCommentString(indent, withStart);
 
             const lines = commentText.split("\n");
 
@@ -182,7 +193,7 @@ export class Documenter implements vs.Disposable {
         }
         else {
             const indent = editor.document.getText(indentRange);
-            const commentText = sb.toCommentString(indent, withStart);
+            commentText = sb.toCommentString(indent, withStart);
 
             edit.insert(location, commentText);
         }
@@ -202,6 +213,10 @@ export class Documenter implements vs.Disposable {
                 console.warn("Error in source file update:", error);
             }
         }
+
+        if (goToDescription) setTimeout(() => {
+            this._goToDescriptionLocation(commentText)
+        }, 100);
     }
 
     private _getSourceFile(document: vs.TextDocument) {
@@ -345,7 +360,8 @@ export class Documenter implements vs.Disposable {
     }
 
     private _emitMemberOf(sb: utils.StringBuilder, parent: ts.Node) {
-        if (parent && (parent.kind === ts.SyntaxKind.ClassDeclaration || parent.kind === ts.SyntaxKind.InterfaceDeclaration))
+        if (parent && (parent.kind === ts.SyntaxKind.ClassDeclaration || parent.kind === ts.SyntaxKind.InterfaceDeclaration)) {
+            sb.appendLine();
             sb.appendLine("@memberOf " + (<any>parent)["name"].text);
         }
     }
@@ -380,12 +396,12 @@ export class Documenter implements vs.Disposable {
                         typeName = "{number}";
                     }
                     else if (initializerValue.indexOf("\"") !== -1 ||
-                            initializerValue.indexOf("'") !== -1 ||
-                            initializerValue.indexOf("`") !== -1) {
+                        initializerValue.indexOf("'") !== -1 ||
+                        initializerValue.indexOf("`") !== -1) {
                         typeName = "{string}";
                     }
                     else if (initializerValue.indexOf("true") !== -1 ||
-                            initializerValue.indexOf("false") !== -1) {
+                        initializerValue.indexOf("false") !== -1) {
                         typeName = "{boolean}";
                     }
                 }
@@ -421,7 +437,7 @@ export class Documenter implements vs.Disposable {
     private _emitConstructorDeclaration(sb: utils.StringBuilder, node: ts.ConstructorDeclaration) {
         sb.appendLine(`Creates an instance of ${
             (<ts.ClassDeclaration>node.parent).name.getText()
-        }.`);
+            }.`);
         sb.appendLine();
 
         this._emitParameters(sb, node);
