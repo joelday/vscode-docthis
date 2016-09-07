@@ -345,7 +345,7 @@ export class Documenter implements vs.Disposable {
     }
 
     private _emitMemberOf(sb: utils.StringBuilder, parent: ts.Node) {
-        if (parent && parent.kind === ts.SyntaxKind.ClassDeclaration) {
+        if (parent && (parent.kind === ts.SyntaxKind.ClassDeclaration || parent.kind === ts.SyntaxKind.InterfaceDeclaration))
             sb.appendLine("@memberOf " + (<any>parent)["name"].text);
         }
     }
