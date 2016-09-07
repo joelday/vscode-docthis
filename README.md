@@ -4,7 +4,7 @@
 ![Demo](images/demo.gif)
 
 # Functionality
-Supports official JSDoc and Closure Compiler tags: @class, @enum, @export, @function, @implements, @interface, @param, @private, @returns, @static, @template and @type.
+Supports official JSDoc and Closure Compiler tags: @class, @enum, @export, @function, @implements, @interface, @param, @private, @returns, @static, @template, @type and @memberOf.
 
 # Commands
 ## Document This
@@ -27,6 +27,11 @@ Prints info about the node ancestry at a given caret position.
 [![Paypal Donations](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=7YU9WH4ANAB4Q&amp;lc=US&amp;item_name=Document%20This&amp;item_number=vscode-docthis%20extension&amp;currency_code=USD&amp;bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted)
 
 ## Changes
+### 0.3.3
+- Adds support for jumping to the description location of the inserted comment. This can be disabled through the `docthis.enableJumpToDescriptionLocation`
+- Adds support for the @memberOf tag for properties and methods of a class. Controlled using the `docthis.includeMemberOfOnClassMembers`
+- Adds support for the @memberOf tag for properties and methods of an interface. Controlled using the `docthis.includeMemberOfOnInterfaceMembers`
+
 ### 0.3.2
 - Adds a config option `docthis.automaticForBlockComments` used to disable automatic comments for `/**`
 - Adds a config option `docthis.includeTypes` used to disable insertion of type names in tags.

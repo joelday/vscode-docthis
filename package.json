@@ -2,12 +2,13 @@
   "name": "docthis",
   "displayName": "Document This",
   "description": "Automatically generates detailed JSDoc comments in TypeScript and JavaScript files.",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "publisher": "joelday",
   "contributors": [
     "Joel Day <joelday@gmail.com> (https://github.com/joelday)",
     "Barney Rubble <jamie@outsharked.com> (http://blog.outsharked.com)",
-    "Vassilis Pitsounis (http://www.pixelnet.gr)"
+    "Vassilis Pitsounis (http://www.pixelnet.gr)",
+    "Ed Bishop <ed@nexdynamic.com> (http://nexdynamic.com)"
   ],
   "icon": "images/icon.svg",
   "galleryBanner": {
@@ -73,6 +74,21 @@
           "type": "boolean",
           "default": true,
           "description": "When enabled, type information is added to comment tags."
+        },
+        "docthis.includeMemberOfOnClassMembers": {
+          "type": "boolean",
+          "default": true,
+          "description": "When enabled, memberOf information is added to comment tags on class members."
+        },
+        "docthis.includeMemberOfOnInterfaceMembers": {
+          "type": "boolean",
+          "default": true,
+          "description": "When enabled, memberOf information is added to comment tags on interface members."
+        },
+        "docthis.enableJumpToDescriptionLocation": {
+          "type": "boolean",
+          "default": true,
+          "description": "When enabled, the cursor will jump to the description location on a single comment insert."
         }
       }
     }

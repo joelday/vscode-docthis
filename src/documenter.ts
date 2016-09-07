@@ -80,14 +80,16 @@ export class Documenter implements vs.Disposable {
         }
     }
 
-    _goToDescriptionLocation(commentText: string) {
-        let lines = commentText.split('\n');
-        let count = lines.length;
-        let line = vs.window.activeTextEditor.selection.start.line - (count - 2);
-        let character = lines[1].length;
-        let position = new vs.Position(line, character);
-        let selection = new vs.Selection(position, position);
-        vs.window.activeTextEditor.selection = selection;
+    _jumpToDescriptionLocation(commentText: string) {
+        if(vs.workspace.getConfiguration().get("docthis.enableJumpToDescriptionLocation", true)) {
+            let lines = commentText.split('\n');
+            let count = lines.length;
+            let line = vs.window.activeTextEditor.selection.start.line - (count - 2);
+            let character = lines[1].length;
+            let position = new vs.Position(line, character);
+            let selection = new vs.Selection(position, position);
+            vs.window.activeTextEditor.selection = selection;
+        }
     }
 
     documentEverything(editor: vs.TextEditor, edit: vs.TextEditorEdit, visibleOnly: boolean, commandName: string) {
@@ -214,9 +216,11 @@ export class Documenter implements vs.Disposable {
             }
         }
 
-        if (goToDescription) setTimeout(() => {
-            this._goToDescriptionLocation(commentText)
-        }, 100);
+        if (goToDescription) {
+            setTimeout(() => {
+                this._jumpToDescriptionLocation(commentText)
+            }, 100);
+        }
     }
 
     private _getSourceFile(document: vs.TextDocument) {
@@ -360,7 +364,9 @@ export class Documenter implements vs.Disposable {
     }
 
     private _emitMemberOf(sb: utils.StringBuilder, parent: ts.Node) {
-        if (parent && (parent.kind === ts.SyntaxKind.ClassDeclaration || parent.kind === ts.SyntaxKind.InterfaceDeclaration)) {
+        let enabledForClasses = parent.kind === ts.SyntaxKind.ClassDeclaration && vs.workspace.getConfiguration().get("docthis.includeMemberOfOnClassMembers", true);
+        let enabledForInterfaces = parent.kind === ts.SyntaxKind.InterfaceDeclaration && vs.workspace.getConfiguration().get("docthis.includeMemberOfOnInterfaceMembers", true);
+        if (parent && (enabledForClasses || enabledForInterfaces)) {
             sb.appendLine();
             sb.appendLine("@memberOf " + (<any>parent)["name"].text);
         }
