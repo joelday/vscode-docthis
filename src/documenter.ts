@@ -158,8 +158,8 @@ export class Documenter implements vs.Disposable {
         const indentStartLocation = new vs.Position(position.line, 0);
 
         let indentRange = new vs.Range(
-             indentStartLocation,
-             location
+            indentStartLocation,
+            location
         );
 
         if (!withStart) {
@@ -267,6 +267,7 @@ export class Documenter implements vs.Disposable {
         this._emitTypeParameters(sb, node);
         this._emitParameters(sb, node);
         this._emitReturns(sb, node);
+        this._emitMemberOf(sb, node.parent);
 
         return ts.getLineAndCharacterOfPosition(sourceFile, targetNode.getStart());
     }
@@ -307,6 +308,8 @@ export class Documenter implements vs.Disposable {
 
             sb.append(`@type ${ utils.formatTypeName(node.type.getText()) }`);
         }
+
+        this._emitMemberOf(sb, node.parent);
     }
 
     private _emitInterfaceDeclaration(sb: utils.StringBuilder, node: ts.InterfaceDeclaration) {
@@ -338,6 +341,13 @@ export class Documenter implements vs.Disposable {
         this._emitTypeParameters(sb, node);
         this._emitParameters(sb, node);
         this._emitReturns(sb, node);
+        this._emitMemberOf(sb, node.parent);
+    }
+
+    private _emitMemberOf(sb: utils.StringBuilder, parent: ts.Node) {
+        if (parent && parent.kind === ts.SyntaxKind.ClassDeclaration) {
+            sb.appendLine("@memberOf " + (<any>parent)["name"].text);
+        }
     }
 
     private _emitReturns(sb: utils.StringBuilder, node: ts.MethodDeclaration | ts.FunctionDeclaration | ts.FunctionExpression | ts.ArrowFunction) {
@@ -415,6 +425,7 @@ export class Documenter implements vs.Disposable {
         sb.appendLine();
 
         this._emitParameters(sb, node);
+        this._emitMemberOf(sb, node.parent);
     }
 
     private _emitTypeParameters(sb: utils.StringBuilder, node: ts.ClassLikeDeclaration | ts.InterfaceDeclaration | ts.MethodDeclaration | ts.FunctionDeclaration | ts.FunctionExpression | ts.ArrowFunction) {
@@ -451,15 +462,15 @@ export class Documenter implements vs.Disposable {
         node.modifiers.forEach(modifier => {
             switch (modifier.kind) {
                 case ts.SyntaxKind.ExportKeyword:
-                sb.appendLine("@export"); return;
+                    sb.appendLine("@export"); return;
                 case ts.SyntaxKind.AbstractKeyword:
-                sb.appendLine("@abstract"); return;
+                    sb.appendLine("@abstract"); return;
                 case ts.SyntaxKind.ProtectedKeyword:
-                sb.appendLine("@protected"); return;
+                    sb.appendLine("@protected"); return;
                 case ts.SyntaxKind.PrivateKeyword:
-                sb.appendLine("@private"); return;
+                    sb.appendLine("@private"); return;
                 case ts.SyntaxKind.StaticKeyword:
-                sb.appendLine("@static"); return;
+                    sb.appendLine("@static"); return;
             }
         });
     }
