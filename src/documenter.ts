@@ -352,6 +352,10 @@ export class Documenter implements vs.Disposable {
         sb.appendLine(`@enum {number}`);
     }
 
+    private _emitDescriptionDeclaration(sb: utils.StringBuilder, node: ts.FunctionDeclaration){
+        sb.appendLine("@description");
+    }
+
     private _emitMethodDeclaration(sb: utils.StringBuilder, node: ts.MethodDeclaration | ts.FunctionDeclaration) {
         sb.appendLine();
         sb.appendLine();
@@ -361,6 +365,7 @@ export class Documenter implements vs.Disposable {
         this._emitParameters(sb, node);
         this._emitReturns(sb, node);
         this._emitMemberOf(sb, node.parent);
+        this._emitDescriptionDeclaration(sb,node);
     }
 
     private _emitMemberOf(sb: utils.StringBuilder, parent: ts.Node) {
