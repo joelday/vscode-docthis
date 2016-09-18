@@ -94,7 +94,7 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
+    "vscode:prepublish": "npm run lint && node ./node_modules/vscode/bin/compile",
     "lint": "node ./node_modules/tslint/bin/tslint src/**/*.ts",
     "compile": "npm run lint && node ./node_modules/vscode/bin/compile -watch -p ./",
     "postinstall": "node ./node_modules/vscode/bin/install"
@@ -105,7 +105,7 @@
   },
   "dependencies": {
     "openurl": "^1.1.1",
-    "serialize-error": "^1.1.0",
+    "serialize-error": "^2.0.0",
     "typescript": "^1.8.10"
   },
   "bugs": {

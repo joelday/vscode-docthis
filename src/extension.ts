@@ -36,12 +36,12 @@ function reportError(error: Error, action: string) {
             const sb = new StringBuilder();
             sb.appendLine("Platform: " + process.platform);
             sb.appendLine();
-            sb.appendLine("Exception:");
-            sb.appendLine(serializeError(error));
-            sb.appendLine();
             sb.appendLine("Steps to reproduce the error:");
             sb.appendLine();
-            sb.appendLine("Code to reproduce error (optional):");
+            sb.appendLine("Code excerpt that reproduces the error (optional):");
+            sb.appendLine();
+            sb.appendLine("Exception:");
+            sb.appendLine(JSON.stringify(serializeError(error)));
 
             const uri = `https://github.com/joelday/vscode-docthis/issues/new?title=${
                 encodeURIComponent(`Exception thrown in '${action}': ${error.message}`)
