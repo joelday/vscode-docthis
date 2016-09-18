@@ -94,9 +94,9 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run lint && node ./node_modules/vscode/bin/compile",
+    "vscode:prepublish": "npm run compile",
     "lint": "node ./node_modules/tslint/bin/tslint src/**/*.ts",
-    "compile": "npm run lint && node ./node_modules/vscode/bin/compile -watch -p ./",
+    "compile": "npm run lint && node ./node_modules/vscode/bin/compile -p ./",
     "postinstall": "node ./node_modules/vscode/bin/install"
   },
   "devDependencies": {
