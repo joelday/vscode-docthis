@@ -2,12 +2,8 @@ import * as vs from "vscode";
 import * as path from "path";
 import * as ts from "typescript";
 import * as utils from "./utilities";
-import * as fs from "fs";
-
-const tsConfigFileName = "tsconfig.json";
 
 export class LanguageServiceHost implements ts.LanguageServiceHost {
-    private _editorFileSnapshot: ts.IScriptSnapshot;
     private _fileNames: string[];
     private _files: ts.Map<{ text: string; version: number; }>;
 

@@ -4,7 +4,7 @@ import * as serializeError from "serialize-error";
 import * as childProcess from "child_process";
 
 import { Documenter } from "./documenter";
-import { StringBuilder, emptyArray } from "./utilities";
+import { StringBuilder } from "./utilities";
 
 let documenter: Documenter;
 
@@ -52,7 +52,7 @@ function reportError(error: Error, action: string) {
             if (process.platform !== "win32") {
                 openurl.open(uri, openErr => { console.error("Failed to launch browser", openErr); });
             } else {
-                const proc = childProcess.spawnSync("cmd", [
+                childProcess.spawnSync("cmd", [
                     "/c",
                     "start",
                     uri.replace(/[&]/g, "^&")
@@ -94,7 +94,6 @@ export function activate(context: vs.ExtensionContext): void {
             return;
         }
 
-        const uri = e.document.uri.toString();
         if (e.contentChanges.length > 1) {
             return;
         }
