@@ -7,7 +7,7 @@
 ![Demo](images/demo.gif)
 
 # Functionality
-Supports official JSDoc and Closure Compiler tags: @class, @enum, @export, @function, @implements, @interface, @param, @private, @returns, @static, @template, @type and @memberOf.
+Supports JSDoc and Closure Compiler tags: @class, @description, @enum, @export, @function, @implements, @interface, @param, @private, @returns, @static, @template, @type and @memberOf.
 
 # Commands
 ## Document This
@@ -30,13 +30,16 @@ Prints info about the node ancestry at a given caret position.
 [![Paypal Donations](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=7YU9WH4ANAB4Q&amp;lc=US&amp;item_name=Document%20This&amp;item_number=vscode-docthis%20extension&amp;currency_code=USD&amp;bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted)
 
 ## Changes
+### 0.3.4
+- Adds support for including a @description tag for functions and methods. Controlled using the `docthis.includeDescriptionTag"` option.
+
 ### 0.3.3
-- Adds support for jumping to the description location of the inserted comment. This can be disabled through the `docthis.enableJumpToDescriptionLocation`
-- Adds support for the @memberOf tag for properties and methods of a class. Controlled using the `docthis.includeMemberOfOnClassMembers`
-- Adds support for the @memberOf tag for properties and methods of an interface. Controlled using the `docthis.includeMemberOfOnInterfaceMembers`
+- Adds support for jumping to the description location of the inserted comment. Controlled using the `docthis.enableJumpToDescriptionLocation` option.
+- Adds support for the @memberOf tag for properties and methods of a class. Controlled using the `docthis.includeMemberOfOnClassMembers` option.
+- Adds support for the @memberOf tag for properties and methods of an interface. Controlled using the `docthis.includeMemberOfOnInterfaceMembers` option.
 
 ### 0.3.2
-- Adds a config option `docthis.automaticForBlockComments` used to disable automatic comments for `/**`
+- Adds a config option `docthis.automaticForBlockComments` used to disable automatic comments for `/**`.
 - Adds a config option `docthis.includeTypes` used to disable insertion of type names in tags.
 
 ### 0.3.1
@@ -71,5 +74,3 @@ Prints info about the node ancestry at a given caret position.
 - @extends and @implements tags now contain type parameters for extended and implemented types.
 - Extension is activated at startup and lazily initialized internally so that a better error message can be shown when a .ts/.js document hasn't been opened yet.
 - Errors now have a "Report Issue" button that opens a pre-filled GitHub issue form.
-
-Thank you to contributions from [jamietre](https://github.com/jamietre) and [vapits](https://github.com/vapits).

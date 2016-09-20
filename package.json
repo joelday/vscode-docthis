@@ -2,7 +2,7 @@
   "name": "docthis",
   "displayName": "Document This",
   "description": "Automatically generates detailed JSDoc comments in TypeScript and JavaScript files.",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "publisher": "joelday",
   "contributors": [
     "Joel Day <joelday@gmail.com> (https://github.com/joelday)",
@@ -90,10 +90,10 @@
           "default": true,
           "description": "When enabled, the cursor will jump to the description location on a single comment insert."
         },
-        "docthis.alwaysIncludeDescriptionTag": {
+        "docthis.includeDescriptionTag": {
           "type": "boolean",
           "default": false,
-          "description": "When enabled, JSDoc comments will always include @description."
+          "description": "When enabled, JSDoc comments for functions and methods will include @description."
         }
       }
     }

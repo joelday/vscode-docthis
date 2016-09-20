@@ -352,7 +352,7 @@ export class Documenter implements vs.Disposable {
     }
 
     private _emitDescriptionDeclaration(sb: utils.StringBuilder) {
-        if (vs.workspace.getConfiguration().get("docthis.alwaysIncludeDescriptionTag", true)) {
+        if (vs.workspace.getConfiguration().get("docthis.includeDescriptionTag", true)) {
             sb.appendLine("@description");
         }
     }
