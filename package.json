@@ -93,7 +93,7 @@
         "docthis.alwaysIncludeDescriptionTag": {
           "type": "boolean",
           "default": true,
-          "description": "When enabled, JSDoc comments will always include @description"
+          "description": "When enabled, JSDoc comments will always include @description."
         }
       }
     }
