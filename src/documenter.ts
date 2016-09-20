@@ -81,13 +81,14 @@ export class Documenter implements vs.Disposable {
     }
 
     _jumpToDescriptionLocation(commentText: string) {
-        if(vs.workspace.getConfiguration().get("docthis.enableJumpToDescriptionLocation", true)) {
-            let lines = commentText.split('\n');
-            let count = lines.length;
-            let line = vs.window.activeTextEditor.selection.start.line - (count - 2);
-            let character = lines[1].length;
-            let position = new vs.Position(line, character);
-            let selection = new vs.Selection(position, position);
+        if (vs.workspace.getConfiguration().get("docthis.enableJumpToDescriptionLocation", true)) {
+            const lines = commentText.split("\n");
+            const count = lines.length;
+            const line = vs.window.activeTextEditor.selection.start.line - (count - 2);
+            const character = lines[1].length;
+            const position = new vs.Position(line, character);
+            const selection = new vs.Selection(position, position);
+
             vs.window.activeTextEditor.selection = selection;
         }
     }
@@ -218,7 +219,7 @@ export class Documenter implements vs.Disposable {
 
         if (goToDescription) {
             setTimeout(() => {
-                this._jumpToDescriptionLocation(commentText)
+                this._jumpToDescriptionLocation(commentText);
             }, 100);
         }
     }
@@ -323,8 +324,6 @@ export class Documenter implements vs.Disposable {
 
         // JSDoc fails to emit documentation for arrow function syntax. (https://github.com/jsdoc3/jsdoc/issues/1100)
         if (includeTypes() && node.type && node.type.getText().indexOf("=>") === -1) {
-            let type = utils.formatTypeName(node.type.getText());
-
             sb.append(`@type ${ utils.formatTypeName(node.type.getText()) }`);
         }
 
@@ -393,7 +392,9 @@ export class Documenter implements vs.Disposable {
     private _emitParameters(sb: utils.StringBuilder, node:
         ts.MethodDeclaration | ts.FunctionDeclaration | ts.ConstructorDeclaration | ts.FunctionExpression | ts.ArrowFunction) {
 
-        if (!node.parameters) return;
+        if (!node.parameters) {
+            return;
+        }
 
         node.parameters.forEach(parameter => {
             const name = parameter.name.getText();
@@ -458,7 +459,9 @@ export class Documenter implements vs.Disposable {
     }
 
     private _emitTypeParameters(sb: utils.StringBuilder, node: ts.ClassLikeDeclaration | ts.InterfaceDeclaration | ts.MethodDeclaration | ts.FunctionDeclaration | ts.FunctionExpression | ts.ArrowFunction) {
-        if (!node.typeParameters) return;
+        if (!node.typeParameters) {
+            return;
+        }
 
         node.typeParameters.forEach(parameter => {
             sb.appendLine(`@template ${ parameter.name.getText() }`);
@@ -466,7 +469,9 @@ export class Documenter implements vs.Disposable {
     }
 
     private _emitHeritageClauses(sb: utils.StringBuilder, node: ts.ClassLikeDeclaration | ts.InterfaceDeclaration) {
-        if (!node.heritageClauses || !includeTypes()) return;
+        if (!node.heritageClauses || !includeTypes()) {
+            return;
+        }
 
         node.heritageClauses.forEach((clause) => {
             const heritageType = clause.token === ts.SyntaxKind.ExtendsKeyword ? "@extends" : "@implements";
@@ -486,7 +491,9 @@ export class Documenter implements vs.Disposable {
     }
 
     private _emitModifiers(sb: utils.StringBuilder, node: ts.Node) {
-        if (!node.modifiers) return;
+        if (!node.modifiers) {
+            return;
+        }
 
         node.modifiers.forEach(modifier => {
             switch (modifier.kind) {

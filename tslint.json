@@ -23,7 +23,9 @@
             true,
             "double"
         ],
-        "semicolon": true,
+        "semicolon": [
+            true
+        ],
         "triple-equals": [
             true,
             "allow-null-check"
@@ -51,6 +53,15 @@
             "check-operator",
             "check-separator",
             "check-type"
-        ]
+        ],
+        "no-consecutive-blank-lines": true,
+        "align": [
+            true
+        ],
+        "no-unused-variable": [
+            true
+        ],
+        "no-unreachable": true,
+        "curly": true
     }
 }

@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/joelday/vscode-docthis.svg?branch=master)](https://travis-ci.org/joelday/vscode-docthis)
+[![dependencies Status](https://david-dm.org/joelday/vscode-docthis/status.svg)](https://david-dm.org/joelday/vscode-docthis)
+
 # Document This
 "Document This" is a Visual Studio Code extension that automatically generates detailed JSDoc comments for both TypeScript and JavaScript files.
 
