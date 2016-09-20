@@ -89,6 +89,11 @@
           "type": "boolean",
           "default": true,
           "description": "When enabled, the cursor will jump to the description location on a single comment insert."
+        },
+        "docthis.alwaysIncludeDescriptionTag": {
+          "type": "boolean",
+          "default": true,
+          "description": "When enabled, JSDoc comments will always include @description."
         }
       }
     }
