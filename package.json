@@ -15,6 +15,7 @@
     "color": "#252627",
     "theme": "dark"
   },
+  "license": "MIT",
   "licenseUrl": "LICENSE",
   "engines": {
     "vscode": "^0.10.6"
