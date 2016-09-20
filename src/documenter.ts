@@ -351,8 +351,8 @@ export class Documenter implements vs.Disposable {
         sb.appendLine(`@enum {number}`);
     }
 
-    private _emitDescriptionDeclaration(sb: utils.StringBuilder, node: ts.FunctionDeclaration){
-        if (vs.workspace.getConfiguration().get("docthis.alwaysIncludeDescriptionTag",true)) {
+    private _emitDescriptionDeclaration(sb: utils.StringBuilder) {
+        if (vs.workspace.getConfiguration().get("docthis.alwaysIncludeDescriptionTag", true)) {
             sb.appendLine("@description");
         }
     }
@@ -366,7 +366,7 @@ export class Documenter implements vs.Disposable {
         this._emitParameters(sb, node);
         this._emitReturns(sb, node);
         this._emitMemberOf(sb, node.parent);
-        this._emitDescriptionDeclaration(sb, node);
+        this._emitDescriptionDeclaration(sb);
     }
 
     private _emitMemberOf(sb: utils.StringBuilder, parent: ts.Node) {
