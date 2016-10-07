@@ -95,6 +95,11 @@
           "type": "boolean",
           "default": false,
           "description": "When enabled, JSDoc comments for functions and methods will include @description."
+        },
+        "docthis.enableHungarianNotationEvaluation": {
+          "type": "boolean",
+          "default": false,
+          "description": "When enabled, hungarian notation will be used as a type hint."
         }
       }
     }

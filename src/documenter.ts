@@ -8,6 +8,10 @@ function includeTypes() {
     return vs.workspace.getConfiguration().get("docthis.includeTypes", true);
 }
 
+function enableHungarianNotationEvaluation() {
+    return vs.workspace.getConfiguration().get("docthis.enableHungarianNotationEvaluation", false);
+}
+
 export class Documenter implements vs.Disposable {
     private _languageServiceHost: LanguageServiceHost;
     private _services: ts.LanguageService;
@@ -323,8 +327,12 @@ export class Documenter implements vs.Disposable {
         this._emitModifiers(sb, node);
 
         // JSDoc fails to emit documentation for arrow function syntax. (https://github.com/jsdoc3/jsdoc/issues/1100)
-        if (includeTypes() && node.type && node.type.getText().indexOf("=>") === -1) {
-            sb.append(`@type ${ utils.formatTypeName(node.type.getText()) }`);
+        if (includeTypes()) {
+            if (node.type && node.type.getText().indexOf("=>") === -1) {
+                sb.append(`@type ${ utils.formatTypeName(node.type.getText()) }`);
+            } else if (enableHungarianNotationEvaluation() && this._isHungarianNotation(node.name.getText())) {
+                sb.append(`@type ${ this._getHungarianNotationType(node.name.getText()) }`);
+            }
         }
 
         this._emitMemberOf(sb, node.parent);
@@ -422,6 +430,9 @@ export class Documenter implements vs.Disposable {
                 else if (parameter.type) {
                     typeName = utils.formatTypeName((isArgs ? "..." : "") + parameter.type.getFullText().trim());
                 }
+                else if (enableHungarianNotationEvaluation() && this._isHungarianNotation(name)) {
+                    typeName = this._getHungarianNotationType(name);
+                }
             }
 
             sb.append("@param ");
@@ -446,6 +457,24 @@ export class Documenter implements vs.Disposable {
 
             sb.appendLine();
         });
+    }
+
+    private _isHungarianNotation(name: string): boolean {
+        return /^[abefimos][A-Z]/.test(name);
+    }
+
+    private _getHungarianNotationType(name: string): string {
+        switch (name.charAt(0)) {
+            case "a": return "{Array}";
+            case "b": return "{boolean}";
+            case "e": return "{Object}"; // Enumeration
+            case "f": return "{function}";
+            case "i": return "{number}";
+            case "m": return "{Object}"; // Map
+            case "o": return "{Object}";
+            case "s": return "{string}";
+            default: return "{any}";
+        }
     }
 
     private _emitConstructorDeclaration(sb: utils.StringBuilder, node: ts.ConstructorDeclaration) {
