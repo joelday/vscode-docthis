@@ -34,7 +34,7 @@ Prints info about the node ancestry at a given caret position.
 - Adds support for hungarian notation for functions and methods. Controlled using the `docthis.enableHungarianNotationEvaluation` option.
 
 ### 0.3.4
-- Adds support for including a @description tag for functions and methods. Controlled using the `docthis.includeDescriptionTag"` option.
+- Adds support for including a @description tag for functions and methods. Controlled using the `docthis.includeDescriptionTag` option.
 
 ### 0.3.3
 - Adds support for jumping to the description location of the inserted comment. Controlled using the `docthis.enableJumpToDescriptionLocation` option.
