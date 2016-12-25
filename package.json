@@ -2,14 +2,8 @@
   "name": "docthis",
   "displayName": "Document This",
   "description": "Automatically generates detailed JSDoc comments in TypeScript and JavaScript files.",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "publisher": "joelday",
-  "contributors": [
-    "Joel Day <joelday@gmail.com> (https://github.com/joelday)",
-    "Barney Rubble <jamie@outsharked.com> (http://blog.outsharked.com)",
-    "Vassilis Pitsounis (http://www.pixelnet.gr)",
-    "Ed Bishop <ed@nexdynamic.com> (http://nexdynamic.com)"
-  ],
   "icon": "images/icon.svg",
   "galleryBanner": {
     "color": "#252627",
