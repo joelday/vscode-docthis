@@ -17,6 +17,7 @@ function lazyInitializeDocumenter() {
 function languageIsSupported(document: vs.TextDocument) {
     return (document.languageId === "javascript" ||
         document.languageId === "typescript" ||
+        document.languageId === "vue" ||
         document.languageId === "javascriptreact" ||
         document.languageId === "typescriptreact");
 }
