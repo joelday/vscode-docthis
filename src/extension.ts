@@ -32,7 +32,11 @@ function verifyLanguageSupport(document: vs.TextDocument, commandName: string) {
 }
 
 function reportError(error: Error, action: string) {
-     vs.window.showErrorMessage(`Sorry! '${action}' encountered an error.`, "Report Issue").then(() => {
+     vs.window.showErrorMessage(`Sorry! '${action}' encountered an error.`, "Report Issue").then((item) => {
+        if (item !== "Report Issue") {
+            return;
+        }
+
         try {
             const sb = new StringBuilder();
             sb.appendLine("Platform: " + process.platform);
