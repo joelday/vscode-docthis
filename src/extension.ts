@@ -76,6 +76,7 @@ function runCommand(commandName: string, document: vs.TextDocument, implFunc: ()
         implFunc();
     }
     catch (e) {
+        debugger;
         reportError(e, commandName);
     }
 }

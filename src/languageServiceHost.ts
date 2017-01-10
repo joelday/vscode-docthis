@@ -4,17 +4,15 @@ import * as ts from "typescript";
 import * as utils from "./utilities";
 
 export class LanguageServiceHost implements ts.LanguageServiceHost {
-    private _fileNames: string[];
     private _files: ts.Map<{ text: string; version: number; }>;
 
     constructor() {
-        this._fileNames = [];
-        this._files = {};
+        this._files = <any>{};
     }
 
-    setCurrentFile(fileName: string, fileText: string) {
-        for (let fileName in this._files) {
-            delete this._files[fileName].text;
+    updateCurrentFile(fileName: string, fileText: string) {
+        for (const existingFileName in this._files) {
+            delete this._files[existingFileName].text;
         }
 
         if (this._files[fileName]) {
@@ -27,7 +25,7 @@ export class LanguageServiceHost implements ts.LanguageServiceHost {
     }
 
     getScriptFileNames() {
-        return this._fileNames;
+        return Object.keys(this._files);
     }
 
     getScriptVersion(fileName: string) {
@@ -49,5 +47,14 @@ export class LanguageServiceHost implements ts.LanguageServiceHost {
 
     getCompilationSettings(): ts.CompilerOptions {
         return {};
+    }
+
+    getSourceFile(fileName: string, languageVersion: ts.ScriptTarget, onError?: (message: string) => void) {
+        debugger;
+        if (!this._files[fileName]) {
+            return;
+        }
+
+        return ts.createSourceFile(fileName, this._files[fileName].text, ts.ScriptTarget.Latest);
     }
 }

@@ -1,8 +1,5 @@
 [![Build Status](https://travis-ci.org/joelday/vscode-docthis.svg?branch=master)](https://travis-ci.org/joelday/vscode-docthis)
 
-## Road to 1.0
-We're actively accepting assistance with development of 1.0 with the aim of adding better editing UX, improved JavaScript generation and multiple language support. The long term goal is to become a universal platform for documentation annotation generation for *any* editor/IDE!
-
 # Document This
 "Document This" is a Visual Studio Code extension that automatically generates detailed JSDoc comments for both TypeScript and JavaScript files.
 
@@ -32,6 +29,9 @@ Prints info about the node ancestry at a given caret position.
 [![Paypal Donations](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=7YU9WH4ANAB4Q&amp;lc=US&amp;item_name=Document%20This&amp;item_number=vscode-docthis%20extension&amp;currency_code=USD&amp;bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted)
 
 ## Changes
+### 0.3.7
+- Upgraded TypeScript and VSCode internals.
+
 ### 0.3.6
 - Adds .vue extension support.
 

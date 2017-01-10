@@ -15,16 +15,14 @@ function enableHungarianNotationEvaluation() {
 export class Documenter implements vs.Disposable {
     private _languageServiceHost: LanguageServiceHost;
     private _services: ts.LanguageService;
-    private _program: ts.Program;
 
     private _outputChannel: vs.OutputChannel;
 
     constructor() {
         this._languageServiceHost = new LanguageServiceHost();
+
         this._services = ts.createLanguageService(
             this._languageServiceHost, ts.createDocumentRegistry());
-
-        this._program = this._services.getProgram();
     }
 
     automaticDocument(editor: vs.TextEditor, edit: vs.TextEditorEdit) {
@@ -231,8 +229,11 @@ export class Documenter implements vs.Disposable {
     private _getSourceFile(document: vs.TextDocument) {
         const fileName = utils.fixWinPath(document.fileName);
         const fileText = document.getText();
-        this._languageServiceHost.setCurrentFile(fileName, fileText);
-        return this._services.getSourceFile(fileName);
+        this._languageServiceHost.updateCurrentFile(fileName, fileText);
+
+        this._services.getSyntacticDiagnostics(fileName);
+
+        return this._services.getProgram().getSourceFile(fileName);
     }
 
     private _documentNode(sb: utils.StringBuilder, node: ts.Node, editor: vs.TextEditor, sourceFile: ts.SourceFile) {

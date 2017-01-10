@@ -2,7 +2,7 @@
   "name": "docthis",
   "displayName": "Document This",
   "description": "Automatically generates detailed JSDoc comments in TypeScript and JavaScript files.",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "publisher": "joelday",
   "icon": "images/icon.svg",
   "galleryBanner": {
@@ -12,7 +12,7 @@
   "license": "MIT",
   "licenseUrl": "LICENSE",
   "engines": {
-    "vscode": "^0.10.6"
+    "vscode": "^1.8.1"
   },
   "categories": [
     "Other",
@@ -101,17 +101,19 @@
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "lint": "node ./node_modules/tslint/bin/tslint src/**/*.ts",
-    "compile": "npm run lint && node ./node_modules/vscode/bin/compile -p ./",
+    "compile": "npm run lint && tsc -p ./",
     "postinstall": "node ./node_modules/vscode/bin/install"
   },
   "devDependencies": {
-    "tslint": "^3.3.0",
-    "vscode": "^0.11.18"
+    "@types/node": "^6.0.59",
+    "@types/mocha": "^2.2.37",
+    "tslint": "^4.3.1",
+    "vscode": "^1.0.3"
   },
   "dependencies": {
     "openurl": "^1.1.1",
     "serialize-error": "^2.0.0",
-    "typescript": "^1.8.10"
+    "typescript": "^2.1.4"
   },
   "bugs": {
     "url": "https://github.com/joelday/vscode-docthis/issues"

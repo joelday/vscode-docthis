@@ -1,21 +1,21 @@
 /**
- * This is a description for the interface. 
- * 
+ * This is a description for the interface.
+ *
  * @interface SomeInterface
  */
 interface SomeInterface {
     /**
-     * Testing @memberOf on an interface with enableJumpToDescriptionLocation set to false. 
-     * 
-     * 
+     * Testing @memberOf on an interface with enableJumpToDescriptionLocation set to false.
+     *
+     *
      * @memberOf SomeInterface
      */
     someFunction1: () => void;
 
     /**
      * Testing interface member with enableJumpToDescriptionLocation set to true.
-     * 
-     * 
+     *
+     *
      * @memberOf SomeInterface
      */
     someFunction2: (someParam1: string, someParam2: number) => boolean;
@@ -28,23 +28,23 @@ interface SomeInterface {
 
 /**
  * This description was written from the //* syntax
- * 
+ *
  * @class SomeClass
  */
 class SomeClass {
     /**
      * Testing a property.
-     * 
+     *
      * @memberOf SomeClass
      */someProperty = true;
 
     /**
      * This description was written from the Ctrl+Alt+D D shortcut.
-     * 
+     *
      * @param {string} someParam1
      * @param {number} someParam2
      * @returns {boolean}
-     * 
+     *
      * @memberOf SomeClass
      */
     someFunction1(someParam1: string, someParam2: number): boolean {
@@ -53,11 +53,11 @@ class SomeClass {
 
     /**
      * This is a test of the enableJumpToDescriptionLocation setting set to true.
-     * 
+     *
      * @param {string} someParam1
      * @param {number} someParam2
      * @returns {boolean}
-     * 
+     *
      * @memberOf SomeClass
      */
     someFunction2(someParam1: string, someParam2: number): boolean {
@@ -66,11 +66,11 @@ class SomeClass {
 
     /**
      * This one was a successful test with the setting off
-     * 
+     *
      * @param {string} someParam1
      * @param {number} someParam2
      * @returns {boolean}
-     * 
+     *
      * @memberOf SomeClass
      */
     someFunction3(someParam1: string, someParam2: number): boolean {
@@ -79,12 +79,12 @@ class SomeClass {
 
     /**
      * Test with private.
-     * 
+     *
      * @private
      * @param {string} someParam1
      * @param {number} someParam2
      * @returns {boolean}
-     * 
+     *
      * @memberOf SomeClass
      */
     private someFunction4(someParam1: string, someParam2: number): boolean {
@@ -93,25 +93,27 @@ class SomeClass {
 
     /**
      * Test with public.
-     * 
+     *
      * @param {string} someParam1
      * @param {number} someParam2
      * @returns {boolean}
-     * 
+     *
      * @memberOf SomeClass
      */
     public someFunction5(someParam1: string, someParam2: number): boolean {
+        // Suppress unused function error
+        this.someFunction4(null, null);
         return true;
     }
 
     /**
      * Test with static.
-     * 
+     *
      * @static
      * @param {string} someParam1
      * @param {number} someParam2
      * @returns {boolean}
-     * 
+     *
      * @memberOf SomeClass
      */
     static someFunction6(someParam1: string, someParam2: number): boolean {
@@ -120,7 +122,7 @@ class SomeClass {
 
     /**
      * Testing with docthis.includeMemberOfOnClassMembers set to false
-     * 
+     *
      * @param {string} someParam1
      * @param {number} someParam2
      * @returns {boolean}
