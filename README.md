@@ -35,11 +35,6 @@ Prints info about the node ancestry at a given caret position.
 ### 0.3.6
 - Adds .vue extension support.
 
-## Changes
-### 0.3.5
-- Adds support for hungarian notation for functions and methods. Controlled using the `docthis.enableHungarianNotationEvaluation` option.
-
-## Changes
 ### 0.3.5
 - Adds support for hungarian notation for functions and methods. Controlled using the `docthis.enableHungarianNotationEvaluation` option.
 
