@@ -50,7 +50,6 @@ export class LanguageServiceHost implements ts.LanguageServiceHost {
     }
 
     getSourceFile(fileName: string, languageVersion: ts.ScriptTarget, onError?: (message: string) => void) {
-        debugger;
         if (!this._files[fileName]) {
             return;
         }
