@@ -46,7 +46,9 @@ export class LanguageServiceHost implements ts.LanguageServiceHost {
     }
 
     getCompilationSettings(): ts.CompilerOptions {
-        return {};
+        return {
+            allowJs: true
+        };
     }
 
     getSourceFile(fileName: string, languageVersion: ts.ScriptTarget, onError?: (message: string) => void) {
