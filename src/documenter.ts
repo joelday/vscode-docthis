@@ -8,6 +8,10 @@ function includeTypes() {
     return vs.workspace.getConfiguration().get("docthis.includeTypes", true);
 }
 
+function inferTypes() {
+    return vs.workspace.getConfiguration().get("docthis.inferTypesFromNames", false);
+}
+
 function enableHungarianNotationEvaluation() {
     return vs.workspace.getConfiguration().get("docthis.enableHungarianNotationEvaluation", false);
 }
@@ -389,15 +393,47 @@ export class Documenter implements vs.Disposable {
         }
     }
 
+    private _isNameBooleanLike(name: string): boolean {
+        return /(?:is|has|can)[A-Z_]/.test(name);
+    }
+
+    private _isNameFunctionLike(name: string): boolean {
+        const fnNames = ["cb", "callback", "done", "next", "fn"];
+        return fnNames.indexOf(name) !== -1;
+    }
+
+    private _inferReturnTypeFromName(name: string): string {
+        if (this._isNameBooleanLike(name)) {
+            return "{boolean}";
+        }
+        return "";
+    }
+
     private _emitReturns(sb: utils.StringBuilder, node: ts.MethodDeclaration | ts.FunctionDeclaration | ts.FunctionExpression | ts.ArrowFunction) {
         if (utils.findNonVoidReturnInCurrentScope(node) || (node.type && node.type.getText() !== "void")) {
             sb.append("@returns");
             if (includeTypes() && node.type) {
                 sb.append(" " + utils.formatTypeName(node.type.getText()));
             }
+            else if (includeTypes() && inferTypes()) {
+                sb.append(" " + this._inferReturnTypeFromName(node.name.getText()));
+            }
 
             sb.appendLine();
         }
+
+    }
+
+    private _inferParamTypeFromName(name: string): string {
+        if (this._isNameFunctionLike(name)) {
+            return "{function}";
+        }
+
+        if (this._isNameBooleanLike(name)) {
+            return "{boolean}";
+        }
+
+        return "{any}";
     }
 
     private _emitParameters(sb: utils.StringBuilder, node:
@@ -435,6 +471,9 @@ export class Documenter implements vs.Disposable {
                 }
                 else if (enableHungarianNotationEvaluation() && this._isHungarianNotation(name)) {
                     typeName = this._getHungarianNotationType(name);
+                }
+                else if (inferTypes()) {
+                    typeName = this._inferParamTypeFromName(name);
                 }
             }
 

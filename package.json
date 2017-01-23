@@ -2,7 +2,7 @@
   "name": "docthis",
   "displayName": "Document This",
   "description": "Automatically generates detailed JSDoc comments in TypeScript and JavaScript files.",
-  "version": "0.3.9",
+  "version": "0.3.10",
   "publisher": "joelday",
   "icon": "images/icon.svg",
   "galleryBanner": {
@@ -94,6 +94,11 @@
           "type": "boolean",
           "default": false,
           "description": "When enabled, hungarian notation will be used as a type hint."
+        },
+        "docthis.inferTypesFromNames": {
+          "type": "boolean",
+          "default": false,
+          "description": "When enabled, will use names of params & methods as type hints."
         }
       }
     }

@@ -29,6 +29,9 @@ Prints info about the node ancestry at a given caret position.
 [![Paypal Donations](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=7YU9WH4ANAB4Q&amp;lc=US&amp;item_name=Document%20This&amp;item_number=vscode-docthis%20extension&amp;currency_code=USD&amp;bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted)
 
 ## Changes
+### 0.3.10
+- Adds option to infer param type & method return type from names if no type info is available. Controlled using the `docthis.inferTypesFromNames` option.
+
 ### 0.3.7
 - Upgraded TypeScript and VSCode internals.
 
