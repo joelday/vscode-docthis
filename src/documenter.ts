@@ -231,10 +231,8 @@ export class Documenter implements vs.Disposable {
     }
 
     private _getSourceFile(document: vs.TextDocument) {
-        const fileName = utils.fixWinPath(document.fileName);
-        const canonicalFileName = ts.sys.useCaseSensitiveFileNames ? fileName.toLowerCase() : fileName;
-
         const fileText = document.getText();
+        const canonicalFileName = utils.getDocumentFileName(document);
         this._languageServiceHost.updateCurrentFile(canonicalFileName, fileText);
 
         this._services.getSyntacticDiagnostics(canonicalFileName);

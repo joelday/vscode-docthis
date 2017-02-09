@@ -2,6 +2,7 @@ import * as vs from "vscode";
 import * as openurl from "openurl";
 import * as serializeError from "serialize-error";
 import * as childProcess from "child_process";
+import * as path from "path";
 
 import { Documenter } from "./documenter";
 import { StringBuilder } from "./utilities";
@@ -19,7 +20,8 @@ function languageIsSupported(document: vs.TextDocument) {
         document.languageId === "typescript" ||
         document.languageId === "vue" ||
         document.languageId === "javascriptreact" ||
-        document.languageId === "typescriptreact");
+        document.languageId === "typescriptreact" ||
+        path.extname(document.fileName) === ".vue");
 }
 
 function verifyLanguageSupport(document: vs.TextDocument, commandName: string) {
@@ -39,6 +41,7 @@ function reportError(error: Error, action: string) {
 
         try {
             const sb = new StringBuilder();
+            sb.appendLine("* Check to see if this might have been reported already. *");
             sb.appendLine("Platform: " + process.platform);
             sb.appendLine();
             sb.appendLine("Steps to reproduce the error:");
@@ -105,15 +108,7 @@ export function activate(context: vs.ExtensionContext): void {
         }
 
         const change = e.contentChanges[0];
-        if (change.text !== "*") {
-            return;
-        }
-
-        const testRange = new vs.Range(
-            new vs.Position(change.range.start.line, change.range.start.character - 2),
-            new vs.Position(change.range.end.line, change.range.end.character + 1));
-
-        if (e.document.getText(testRange) === "/**") {
+        if (change.text === "* */") {
             setTimeout(() => {
                 editor.edit(edit => {
                     try {

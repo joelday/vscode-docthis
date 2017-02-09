@@ -1,5 +1,6 @@
 import * as path from "path";
 import * as ts from "typescript";
+import * as vs from "vscode";
 
 const supportedNodeKinds = [
     ts.SyntaxKind.ClassDeclaration,
@@ -21,6 +22,19 @@ export function emptyArray(arr: any[]) {
     while (arr.length > 0) {
         arr.pop();
     }
+}
+
+export function getDocumentFileName(document: vs.TextDocument) {
+    // Fix directory delimiters
+    const fileName = fixWinPath(document.fileName);
+
+    // Determine if this is a TypeScript document
+    const isTypeScript = document.languageId === "typescript" || document.languageId === "typescriptreact";
+
+    // Append ".js" if this is not a TypeScript document, but the extension is not ".js"
+    // TypeScript's file resolution for allowJs seems to ignore documents if they're missing the extension
+    const adjustedFileName = !isTypeScript && path.extname(fileName) !== "js" ? fileName + ".js" : fileName;
+    return ts.sys.useCaseSensitiveFileNames ? adjustedFileName.toLowerCase() : adjustedFileName;
 }
 
 export function fixWinPath(filePath: string) {
