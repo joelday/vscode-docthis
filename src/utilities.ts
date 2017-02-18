@@ -166,50 +166,15 @@ export class StringBuilder {
     private _text = "";
 
     append(text = "") {
-        this._text += text;
+        this._text += text.toString();
     }
 
     appendLine(text = "") {
-        this._text += text + "\n";
+        this._text += text.toString() + "\n";
     }
 
     toString() {
         return this._text;
-    }
-
-    toCommentString(indent = "", withStart = true) {
-        let sb = new StringBuilder();
-
-        if (withStart) {
-            sb.appendLine("/**");
-        }
-        else {
-            sb.appendLine();
-        }
-
-        const lines = this._text.split("\n");
-        if (lines.every(l => l === "")) {
-            emptyArray(lines);
-            lines.push("");
-            lines.push("");
-        }
-
-        lines.forEach((line, i) => {
-            if (line === "" && i === lines.length - 1) {
-                return;
-            }
-
-            sb.append(indent + " * ");
-            sb.appendLine(line);
-        });
-
-        if (withStart) {
-            sb.appendLine(indent + " */");
-        }
-
-        sb.append(indent);
-
-        return sb.toString();
     }
 }
 
@@ -229,4 +194,64 @@ export function formatTypeName(typeName: string) {
     }
 
     return "{" + typeName + "}";
+}
+
+export class SnippetStringBuilder {
+    private readonly _snippet = new vs.SnippetString();
+
+    append(value: string) {
+        this._snippet.appendText(value.toString());
+
+        return this;
+    }
+
+    appendLine(value: string = "") {
+        this.append(value.toString() + "\n");
+        return this;
+    }
+
+    appendSnippetTabstop(index?: number) {
+        this._snippet.appendTabstop(index);
+
+        return this;
+    }
+
+    appendSnippetPlaceholder(value: string | ((snippet: vs.SnippetString) => any), index?: number) {
+        this._snippet.appendPlaceholder(value, index);
+
+        return this;
+    }
+
+    appendSnippetVariable(name: string, defaultValue: string | ((snippet: vs.SnippetString) => any)) {
+        this._snippet.appendVariable(name, defaultValue);
+
+        return this;
+    }
+
+    toCommentValue(includeEndcaps = true) {
+        let sb = new StringBuilder();
+
+        if (includeEndcaps) {
+            sb.appendLine("/**");
+        }
+        else {
+            sb.appendLine();
+        }
+
+        const lines = this._snippet.value.split("\n");
+        lines.forEach((line, i) => {
+            if (line === "" && i === lines.length - 1) {
+                return;
+            }
+
+            sb.append(" * ");
+            sb.appendLine(line);
+        });
+
+        if (includeEndcaps) {
+            sb.appendLine(" */");
+        }
+
+        return new vs.SnippetString(sb.toString());
+    }
 }

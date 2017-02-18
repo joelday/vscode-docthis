@@ -2,7 +2,7 @@
   "name": "docthis",
   "displayName": "Document This",
   "description": "Automatically generates detailed JSDoc comments in TypeScript and JavaScript files.",
-  "version": "0.3.11",
+  "version": "0.4.0",
   "publisher": "joelday",
   "icon": "images/icon.svg",
   "galleryBanner": {
@@ -12,7 +12,7 @@
   "license": "MIT",
   "licenseUrl": "LICENSE",
   "engines": {
-    "vscode": "^1.8.1"
+    "vscode": "^1.9.0"
   },
   "categories": [
     "Other",
@@ -30,30 +30,21 @@
         "title": "Document This"
       },
       {
-        "command": "docthis.documentEverything",
-        "title": "Document Everything"
-      },
-      {
-        "command": "docthis.documentEverythingVisible",
-        "title": "Document Everything Visible"
-      },
-      {
         "command": "docthis.traceTypeScriptSyntaxNode",
         "title": "Trace TypeScript Syntax Node"
       }
     ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "docthis.documentThis"
+        }
+      ]
+    },
     "keybindings": [
       {
         "command": "docthis.documentThis",
         "key": "ctrl+alt+d ctrl+alt+d"
-      },
-      {
-        "command": "docthis.documentEverything",
-        "key": "ctrl+alt+d ctrl+alt+e"
-      },
-      {
-        "command": "docthis.documentEverythingVisible",
-        "key": "ctrl+alt+d ctrl+alt+v"
       }
     ],
     "configuration": {
@@ -79,11 +70,6 @@
           "type": "boolean",
           "default": true,
           "description": "When enabled, memberOf information is added to comment tags on interface members."
-        },
-        "docthis.enableJumpToDescriptionLocation": {
-          "type": "boolean",
-          "default": true,
-          "description": "When enabled, the cursor will jump to the description location on a single comment insert."
         },
         "docthis.includeDescriptionTag": {
           "type": "boolean",
@@ -116,8 +102,6 @@
     "vscode": "^1.0.3"
   },
   "dependencies": {
-    "openurl": "^1.1.1",
-    "serialize-error": "^2.0.0",
     "typescript": "^2.2.0"
   },
   "bugs": {
