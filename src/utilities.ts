@@ -16,7 +16,8 @@ const supportedNodeKinds = [
     ts.SyntaxKind.MethodSignature,
     ts.SyntaxKind.PropertySignature,
     ts.SyntaxKind.Constructor,
-    ts.SyntaxKind.FunctionExpression];
+    ts.SyntaxKind.FunctionExpression,
+    ts.SyntaxKind.VariableDeclaration];
 
 export function emptyArray(arr: any[]) {
     while (arr.length > 0) {

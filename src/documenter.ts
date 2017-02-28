@@ -41,7 +41,7 @@ export class Documenter implements vs.Disposable {
 
         const sb = new utils.SnippetStringBuilder();
 
-        const foundLocation = this._documentNode(sb, documentNode, editor, sourceFile);
+        const foundLocation = this._documentNode(sb, documentNode, sourceFile);
         if (foundLocation) {
             const foundLocationOffset = editor.document.offsetAt(new vs.Position(foundLocation.line, foundLocation.character));
             const caretOffset = editor.document.offsetAt(caret);
@@ -70,7 +70,7 @@ export class Documenter implements vs.Disposable {
 
         const sb = new utils.SnippetStringBuilder();
 
-        const docLocation = this._documentNode(sb, documentNode, editor, sourceFile);
+        const docLocation = this._documentNode(sb, documentNode, sourceFile);
         if (docLocation) {
             this._insertDocumentation(sb, docLocation, editor, true);
         } else {
@@ -96,7 +96,7 @@ export class Documenter implements vs.Disposable {
         }
 
         const sb = new utils.StringBuilder();
-        nodes.reverse().forEach(n => {
+        nodes.reverse().forEach((n, i) => {
             sb.appendLine(n);
         });
 
@@ -110,7 +110,17 @@ export class Documenter implements vs.Disposable {
 
     private _printNodeInfo(node: ts.Node, sourceFile: ts.SourceFile) {
         const sb = new utils.StringBuilder();
-        sb.appendLine(`${ node.getStart() } to ${ node.getEnd() } --- (${node.kind}) ${ (<any>ts).SyntaxKind[node.kind] }`);
+        sb.append(`${ node.getStart() } to ${ node.getEnd() } --- (${node.kind}) ${ (<any>ts).SyntaxKind[node.kind] }`);
+
+        if (node.parent) {
+            const nodeIndex = node.parent.getChildren().indexOf(node);
+
+            if (nodeIndex !== -1) {
+                sb.append(` - Index of parent: ${nodeIndex}`);
+            }
+        }
+
+        sb.appendLine();
 
         const column = sourceFile.getLineAndCharacterOfPosition(node.getStart()).character;
         for (let i = 0; i < column; i++) {
@@ -152,7 +162,7 @@ export class Documenter implements vs.Disposable {
         return sourceFile;
     }
 
-    private _documentNode(sb: utils.SnippetStringBuilder, node: ts.Node, editor: vs.TextEditor, sourceFile: ts.SourceFile) {
+    private _documentNode(sb: utils.SnippetStringBuilder, node: ts.Node, sourceFile: ts.SourceFile) {
         switch (node.kind) {
             case ts.SyntaxKind.ClassDeclaration:
                 this._emitClassDeclaration(sb, <ts.ClassDeclaration>node);
@@ -183,6 +193,8 @@ export class Documenter implements vs.Disposable {
             case ts.SyntaxKind.FunctionExpression:
             case ts.SyntaxKind.ArrowFunction:
                 return this._emitFunctionExpression(sb, <ts.FunctionExpression>node, sourceFile);
+            case ts.SyntaxKind.VariableDeclaration:
+                return this._emitVariableDeclaration(sb, <ts.VariableDeclaration>node, sourceFile);
             default:
                 return;
         }
@@ -203,13 +215,24 @@ export class Documenter implements vs.Disposable {
         sb.appendLine();
     }
 
+    private _emitVariableDeclaration(sb: utils.SnippetStringBuilder, node: ts.VariableDeclaration, sourceFile: ts.SourceFile) {
+        for (const child of node.getChildren()) {
+            const result = this._documentNode(sb, child, sourceFile);
+            if (result) {
+                return result;
+            }
+        }
+
+        return;
+    }
+
     private _emitFunctionExpression(sb: utils.SnippetStringBuilder, node: ts.FunctionExpression | ts.ArrowFunction, sourceFile: ts.SourceFile) {
         let targetNode = node.parent;
 
         if (node.parent.kind !== ts.SyntaxKind.PropertyAssignment &&
             node.parent.kind !== ts.SyntaxKind.BinaryExpression) {
 
-            targetNode = utils.findFirstParent(targetNode, [ts.SyntaxKind.VariableDeclarationList]);
+            targetNode = utils.findFirstParent(targetNode, [ts.SyntaxKind.VariableDeclarationList, ts.SyntaxKind.VariableDeclaration]);
             if (!targetNode) {
                 return;
             }
@@ -230,7 +253,13 @@ export class Documenter implements vs.Disposable {
 
         this._emitModifiers(sb, node);
 
-        sb.appendLine(`@class ${ node.name.getText() }`);
+        sb.append("@class");
+
+        if (node.name) {
+            sb.append(` ${ node.name.getText() }`);
+        }
+
+        sb.appendLine();
 
         this._emitHeritageClauses(sb, node);
         this._emitTypeParameters(sb, node);

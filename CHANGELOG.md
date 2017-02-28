@@ -1,3 +1,9 @@
+### 0.4.2
+- Support for unnamed classes.
+
+### 0.4.1
+- Support for variable assigned function expressions.
+
 ### 0.4.1
 - No longer showing error message on /** autocomplete failures.
 

@@ -4103,3 +4103,7 @@ class SomeClass {
         return true;
     }
 }
+
+const testFunc = () => {
+
+}
