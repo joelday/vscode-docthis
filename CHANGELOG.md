@@ -1,3 +1,6 @@
+### 0.4.1
+- No longer showing error message on /** autocomplete failures.
+
 ### 0.4.0
 - Now adds documentation as snippets, with tab stops for descriptions!
 

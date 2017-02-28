@@ -71,7 +71,7 @@ export function activate(context: vs.ExtensionContext): void {
                     documenter.automaticDocument(editor);
                 }
                 catch (ex) {
-                    vs.window.showErrorMessage("docthis: Failed to document at current position: " + ex.message);
+                    /** vs.window.showErrorMessage("docthis: Failed to document at current position: " + ex.message); */
                     console.error("docthis: Failed to document at current position.");
                 }
             }, 0);
