@@ -1,10 +1,11 @@
+### 0.4.3
+- Omit @memberOf on unnamed classes.
+
 ### 0.4.2
 - Support for unnamed classes.
 
 ### 0.4.1
 - Support for variable assigned function expressions.
-
-### 0.4.1
 - No longer showing error message on /** autocomplete failures.
 
 ### 0.4.0
@@ -16,7 +17,7 @@
 - Fixes issue with `docthis.automaticForBlockComments` failing to trigger.
 
 ### 0.3.10
-- Adds option to infer param type & method return type from names if no type info is available. Controlled using the `docthis.inferTypesFromNames` option.
+- Adds option to infer param and return types from names when no type info is available. Controlled using the `docthis.inferTypesFromNames` option.
 
 ### 0.3.7
 - Upgraded TypeScript and VSCode internals.

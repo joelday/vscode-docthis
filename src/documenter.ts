@@ -326,7 +326,7 @@ export class Documenter implements vs.Disposable {
     private _emitMemberOf(sb: utils.SnippetStringBuilder, parent: ts.Node) {
         let enabledForClasses = parent.kind === ts.SyntaxKind.ClassDeclaration && vs.workspace.getConfiguration().get("docthis.includeMemberOfOnClassMembers", true);
         let enabledForInterfaces = parent.kind === ts.SyntaxKind.InterfaceDeclaration && vs.workspace.getConfiguration().get("docthis.includeMemberOfOnInterfaceMembers", true);
-        if (parent && (enabledForClasses || enabledForInterfaces)) {
+        if (parent && (<any>parent)["name"] && (enabledForClasses || enabledForInterfaces)) {
             sb.appendLine();
             sb.appendLine("@memberOf " + (<any>parent)["name"].text);
         }
