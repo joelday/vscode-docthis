@@ -328,7 +328,7 @@ export class Documenter implements vs.Disposable {
         let enabledForInterfaces = parent.kind === ts.SyntaxKind.InterfaceDeclaration && vs.workspace.getConfiguration().get("docthis.includeMemberOfOnInterfaceMembers", true);
         if (parent && (<any>parent)["name"] && (enabledForClasses || enabledForInterfaces)) {
             sb.appendLine();
-            sb.appendLine("@memberOf " + (<any>parent)["name"].text);
+            sb.appendLine("@memberof " + (<any>parent)["name"].text);
         }
     }
 
