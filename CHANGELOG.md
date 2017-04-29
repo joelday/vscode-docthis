@@ -1,3 +1,6 @@
+### 0.4.4
+- Change casing @memberof to all lower-case.
+
 ### 0.4.3
 - Omit @memberOf on unnamed classes.
 
