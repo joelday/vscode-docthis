@@ -486,6 +486,7 @@ export class Documenter implements vs.Disposable {
             (<ts.ClassDeclaration>node.parent).name.getText()
             }.`);
         sb.appendLine();
+        this._emitAuthor(sb);
 
         this._emitParameters(sb, node);
         this._emitMemberOf(sb, node.parent);
