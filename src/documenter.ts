@@ -8,6 +8,25 @@ function includeTypes() {
     return vs.workspace.getConfiguration().get("docthis.includeTypes", true);
 }
 
+function includeTags() {
+    return vs.workspace.getConfiguration().get("docthis.includeTags", ["@class",
+        "@readonly",
+        "@interface",
+        "@enum",
+        "@description",
+        "@memberOf",
+        "@returns",
+        "@param",
+        "@template",
+        "@extends",
+        "@implements",
+        "@export",
+        "@abstract",
+        "@protected",
+        "@private",
+        "@static"]);
+}
+
 function inferTypes() {
     return vs.workspace.getConfiguration().get("docthis.inferTypesFromNames", false);
 }
@@ -21,15 +40,19 @@ export class Documenter implements vs.Disposable {
     private _services: ts.LanguageService;
 
     private _outputChannel: vs.OutputChannel;
+    private _includeTags: string[];
 
     constructor() {
         this._languageServiceHost = new LanguageServiceHost();
 
         this._services = ts.createLanguageService(
             this._languageServiceHost, ts.createDocumentRegistry());
+        this._includeTags = includeTags();
     }
 
     automaticDocument(editor: vs.TextEditor) {
+        this._includeTags = includeTags();
+
         const selection = editor.selection;
         const caret = selection.start;
 
@@ -54,6 +77,8 @@ export class Documenter implements vs.Disposable {
     }
 
     documentThis(editor: vs.TextEditor, commandName: string) {
+        this._includeTags = includeTags();
+
         const sourceFile = this._getSourceFile(editor.document);
 
         const selection = editor.selection;
@@ -79,6 +104,7 @@ export class Documenter implements vs.Disposable {
     }
 
     traceNode(editor: vs.TextEditor) {
+        this._includeTags = includeTags();
         const selection = editor.selection;
         const caret = selection.start;
 
@@ -108,9 +134,17 @@ export class Documenter implements vs.Disposable {
         this._outputChannel.appendLine(sb.toString());
     }
 
+    private _isIncludeTags(type: string) {
+        if (this._includeTags.indexOf(type) !== -1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     private _printNodeInfo(node: ts.Node, sourceFile: ts.SourceFile) {
         const sb = new utils.StringBuilder();
-        sb.append(`${ node.getStart() } to ${ node.getEnd() } --- (${node.kind}) ${ (<any>ts).SyntaxKind[node.kind] }`);
+        sb.append(`${node.getStart()} to ${node.getEnd()} --- (${node.kind}) ${(<any>ts).SyntaxKind[node.kind]}`);
 
         if (node.parent) {
             const nodeIndex = node.parent.getChildren().indexOf(node);
@@ -203,7 +237,7 @@ export class Documenter implements vs.Disposable {
     }
 
     private _emitDescriptionHeader(sb: utils.SnippetStringBuilder) {
-        if (vs.workspace.getConfiguration().get("docthis.includeDescriptionTag", false)) {
+        if (vs.workspace.getConfiguration().get("docthis.includeDescriptionTag", false) && this._isIncludeTags("@description")) {
             sb.append("@description ");
         }
         else {
@@ -252,11 +286,12 @@ export class Documenter implements vs.Disposable {
         this._emitDescriptionHeader(sb);
 
         this._emitModifiers(sb, node);
-
-        sb.append("@class");
+        if (this._isIncludeTags("@class")) {
+            sb.append("@class");
+        }
 
         if (node.name) {
-            sb.append(` ${ node.name.getText() }`);
+            sb.append(` ${node.name.getText()}`);
         }
 
         sb.appendLine();
@@ -275,7 +310,7 @@ export class Documenter implements vs.Disposable {
             let hasSetter = !!parentClass.members.find(c => c.kind === ts.SyntaxKind.SetAccessor &&
                 utils.findFirstChildOfKindDepthFirst(c, [ts.SyntaxKind.Identifier]).getText() === name);
 
-            if (!hasSetter) {
+            if (!hasSetter && this._isIncludeTags("@readonly")) {
                 sb.appendLine("@readonly");
             }
         }
@@ -285,9 +320,9 @@ export class Documenter implements vs.Disposable {
         // JSDoc fails to emit documentation for arrow function syntax. (https://github.com/jsdoc3/jsdoc/issues/1100)
         if (includeTypes()) {
             if (node.type && node.type.getText().indexOf("=>") === -1) {
-                sb.append(`@type ${ utils.formatTypeName(node.type.getText()) }`);
+                sb.append(`@type ${utils.formatTypeName(node.type.getText())}`);
             } else if (enableHungarianNotationEvaluation() && this._isHungarianNotation(node.name.getText())) {
-                sb.append(`@type ${ this._getHungarianNotationType(node.name.getText()) }`);
+                sb.append(`@type ${this._getHungarianNotationType(node.name.getText())}`);
             }
         }
 
@@ -299,7 +334,7 @@ export class Documenter implements vs.Disposable {
 
         this._emitModifiers(sb, node);
 
-        sb.appendLine(`@interface ${ node.name.getText() }`);
+        sb.appendLine(`@interface ${node.name.getText()}`);
 
         this._emitHeritageClauses(sb, node);
         this._emitTypeParameters(sb, node);
@@ -326,7 +361,8 @@ export class Documenter implements vs.Disposable {
     private _emitMemberOf(sb: utils.SnippetStringBuilder, parent: ts.Node) {
         let enabledForClasses = parent.kind === ts.SyntaxKind.ClassDeclaration && vs.workspace.getConfiguration().get("docthis.includeMemberOfOnClassMembers", true);
         let enabledForInterfaces = parent.kind === ts.SyntaxKind.InterfaceDeclaration && vs.workspace.getConfiguration().get("docthis.includeMemberOfOnInterfaceMembers", true);
-        if (parent && (<any>parent)["name"] && (enabledForClasses || enabledForInterfaces)) {
+
+        if (parent && this._isIncludeTags("@memberOf") && (<any>parent)["name"] && (enabledForClasses || enabledForInterfaces)) {
             sb.appendLine();
             sb.appendLine("@memberof " + (<any>parent)["name"].text);
         }
@@ -350,7 +386,7 @@ export class Documenter implements vs.Disposable {
     }
 
     private _emitReturns(sb: utils.SnippetStringBuilder, node: ts.MethodDeclaration | ts.FunctionDeclaration | ts.FunctionExpression | ts.ArrowFunction) {
-        if (utils.findNonVoidReturnInCurrentScope(node) || (node.type && node.type.getText() !== "void")) {
+        if (this._isIncludeTags("@returns") && (utils.findNonVoidReturnInCurrentScope(node) || (node.type && node.type.getText() !== "void"))) {
             sb.append("@returns");
             if (includeTypes() && node.type) {
                 sb.append(" " + utils.formatTypeName(node.type.getText()));
@@ -387,6 +423,9 @@ export class Documenter implements vs.Disposable {
         }
 
         node.parameters.forEach(parameter => {
+            if (!this._isIncludeTags("@param")) {
+                return;
+            }
             const name = parameter.name.getText();
             const isOptional = parameter.questionToken || parameter.initializer;
             const isArgs = !!parameter.dotDotDotToken;
@@ -481,7 +520,7 @@ export class Documenter implements vs.Disposable {
         }
 
         node.typeParameters.forEach(parameter => {
-            sb.append(`@template ${ parameter.name.getText() } `);
+            sb.append(`@template ${parameter.name.getText()} `);
             sb.appendSnippetTabstop();
             sb.appendLine();
         });
@@ -494,7 +533,9 @@ export class Documenter implements vs.Disposable {
 
         node.heritageClauses.forEach((clause) => {
             const heritageType = clause.token === ts.SyntaxKind.ExtendsKeyword ? "@extends" : "@implements";
-
+            if (!this._isIncludeTags(heritageType)) {
+                return;
+            }
             clause.types.forEach(t => {
                 let tn = t.expression.getText();
                 if (t.typeArguments) {
@@ -503,7 +544,7 @@ export class Documenter implements vs.Disposable {
                     tn += ">";
                 }
 
-                sb.append(`${ heritageType } ${ utils.formatTypeName(tn) }`);
+                sb.append(`${heritageType} ${utils.formatTypeName(tn)}`);
                 sb.appendLine();
             });
         });
@@ -517,15 +558,26 @@ export class Documenter implements vs.Disposable {
         node.modifiers.forEach(modifier => {
             switch (modifier.kind) {
                 case ts.SyntaxKind.ExportKeyword:
-                    sb.appendLine("@export"); return;
+                    if (this._isIncludeTags("@export")) {
+                        sb.appendLine("@export");
+                    }
+                    return;
                 case ts.SyntaxKind.AbstractKeyword:
-                    sb.appendLine("@abstract"); return;
+                    if (this._isIncludeTags("@abstract")) {
+                        sb.appendLine("@abstract");
+                    } return;
                 case ts.SyntaxKind.ProtectedKeyword:
-                    sb.appendLine("@protected"); return;
+                    if (this._isIncludeTags("@protected")) {
+                        sb.appendLine("@protected");
+                    } return;
                 case ts.SyntaxKind.PrivateKeyword:
-                    sb.appendLine("@private"); return;
+                    if (this._isIncludeTags("@private")) {
+                        sb.appendLine("@private");
+                    } return;
                 case ts.SyntaxKind.StaticKeyword:
-                    sb.appendLine("@static"); return;
+                    if (this._isIncludeTags("@static")) {
+                        sb.appendLine("@static");
+                    } return;
             }
         });
     }

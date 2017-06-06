@@ -85,6 +85,28 @@
           "type": "boolean",
           "default": false,
           "description": "When enabled, will use names of params & methods as type hints."
+        },
+        "docthis.includeTags": {
+          "type": "array",
+          "default": [
+            "@class",
+            "@readonly",
+            "@interface",
+            "@enum",
+            "@description",
+            "@memberOf",
+            "@returns",
+            "@param",
+            "@template",
+            "@extends",
+            "@implements",
+            "@export",
+            "@abstract",
+            "@protected",
+            "@private",
+            "@static"
+          ],
+          "description": "able to customize what tags are added to classes/functions etc. "
         }
       }
     }
