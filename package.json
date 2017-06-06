@@ -2,7 +2,7 @@
   "name": "docthis",
   "displayName": "Document This",
   "description": "Automatically generates detailed JSDoc comments in TypeScript and JavaScript files.",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "publisher": "joelday",
   "icon": "images/icon.svg",
   "galleryBanner": {
@@ -85,6 +85,16 @@
           "type": "boolean",
           "default": false,
           "description": "When enabled, will use names of params & methods as type hints."
+        },
+        "docthis.includeAuthorTag": {
+          "type": "boolean",
+          "default": false,
+          "description": "When enabled, will display the @author JSDoc tag, see config -> docthis.authorName ."
+        },
+        "docthis.authorName": {
+          "type": "string",
+          "default": "Firstname Name - <e-mail@address.com>",
+          "description": "When docthis.includeAuthorTag is enabled, will display @author tag with the value set here."
         }
       }
     }
