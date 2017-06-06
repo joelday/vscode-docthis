@@ -110,7 +110,7 @@ export class Documenter implements vs.Disposable {
 
     private _printNodeInfo(node: ts.Node, sourceFile: ts.SourceFile) {
         const sb = new utils.StringBuilder();
-        sb.append(`${node.getStart()} to ${node.getEnd()} --- (${node.kind}) ${(<any>ts).SyntaxKind[node.kind]}`);
+        sb.append(`${ node.getStart() } to ${ node.getEnd() } --- (${node.kind}) ${ (<any>ts).SyntaxKind[node.kind] }`);
 
         if (node.parent) {
             const nodeIndex = node.parent.getChildren().indexOf(node);
@@ -215,19 +215,6 @@ export class Documenter implements vs.Disposable {
         sb.appendLine();
     }
 
-    private _emitAuthor(sb: utils.SnippetStringBuilder) {
-        if (vs.workspace.getConfiguration().get("docthis.includeAuthorTag", false)) {
-            let author: string = vs.workspace.getConfiguration().get("docthis.authorName", "-- SET AUTHOR VALUE IN CONFIGURATION docthis.authorDefault--");
-            sb.append("@author " + author);
-        }
-        else {
-            sb.append("");
-        }
-
-        sb.appendSnippetTabstop();
-        sb.appendLine();
-    }
-
     private _emitVariableDeclaration(sb: utils.SnippetStringBuilder, node: ts.VariableDeclaration, sourceFile: ts.SourceFile) {
         for (const child of node.getChildren()) {
             const result = this._documentNode(sb, child, sourceFile);
@@ -263,14 +250,13 @@ export class Documenter implements vs.Disposable {
 
     private _emitClassDeclaration(sb: utils.SnippetStringBuilder, node: ts.ClassDeclaration) {
         this._emitDescriptionHeader(sb);
-        this._emitAuthor(sb);
 
         this._emitModifiers(sb, node);
 
         sb.append("@class");
 
         if (node.name) {
-            sb.append(` ${node.name.getText()}`);
+            sb.append(` ${ node.name.getText() }`);
         }
 
         sb.appendLine();
@@ -299,9 +285,9 @@ export class Documenter implements vs.Disposable {
         // JSDoc fails to emit documentation for arrow function syntax. (https://github.com/jsdoc3/jsdoc/issues/1100)
         if (includeTypes()) {
             if (node.type && node.type.getText().indexOf("=>") === -1) {
-                sb.append(`@type ${utils.formatTypeName(node.type.getText())}`);
+                sb.append(`@type ${ utils.formatTypeName(node.type.getText()) }`);
             } else if (enableHungarianNotationEvaluation() && this._isHungarianNotation(node.name.getText())) {
-                sb.append(`@type ${this._getHungarianNotationType(node.name.getText())}`);
+                sb.append(`@type ${ this._getHungarianNotationType(node.name.getText()) }`);
             }
         }
 
@@ -310,11 +296,10 @@ export class Documenter implements vs.Disposable {
 
     private _emitInterfaceDeclaration(sb: utils.SnippetStringBuilder, node: ts.InterfaceDeclaration) {
         this._emitDescriptionHeader(sb);
-        this._emitAuthor(sb);
 
         this._emitModifiers(sb, node);
 
-        sb.appendLine(`@interface ${node.name.getText()}`);
+        sb.appendLine(`@interface ${ node.name.getText() }`);
 
         this._emitHeritageClauses(sb, node);
         this._emitTypeParameters(sb, node);
@@ -330,7 +315,6 @@ export class Documenter implements vs.Disposable {
 
     private _emitMethodDeclaration(sb: utils.SnippetStringBuilder, node: ts.MethodDeclaration | ts.FunctionDeclaration) {
         this._emitDescriptionHeader(sb);
-        this._emitAuthor(sb);
 
         this._emitModifiers(sb, node);
         this._emitTypeParameters(sb, node);
@@ -486,7 +470,6 @@ export class Documenter implements vs.Disposable {
             (<ts.ClassDeclaration>node.parent).name.getText()
             }.`);
         sb.appendLine();
-        this._emitAuthor(sb);
 
         this._emitParameters(sb, node);
         this._emitMemberOf(sb, node.parent);
@@ -498,7 +481,7 @@ export class Documenter implements vs.Disposable {
         }
 
         node.typeParameters.forEach(parameter => {
-            sb.append(`@template ${parameter.name.getText()} `);
+            sb.append(`@template ${ parameter.name.getText() } `);
             sb.appendSnippetTabstop();
             sb.appendLine();
         });
@@ -520,7 +503,7 @@ export class Documenter implements vs.Disposable {
                     tn += ">";
                 }
 
-                sb.append(`${heritageType} ${utils.formatTypeName(tn)}`);
+                sb.append(`${ heritageType } ${ utils.formatTypeName(tn) }`);
                 sb.appendLine();
             });
         });
