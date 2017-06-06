@@ -4,15 +4,15 @@ import * as utils from "./utilities";
 
 import { LanguageServiceHost } from "./languageServiceHost";
 
-function includeTypes() {
+export function includeTypes() {
     return vs.workspace.getConfiguration().get("docthis.includeTypes", true);
 }
 
-function inferTypes() {
+export function inferTypes() {
     return vs.workspace.getConfiguration().get("docthis.inferTypesFromNames", false);
 }
 
-function enableHungarianNotationEvaluation() {
+export function enableHungarianNotationEvaluation() {
     return vs.workspace.getConfiguration().get("docthis.enableHungarianNotationEvaluation", false);
 }
 
@@ -202,7 +202,7 @@ export class Documenter implements vs.Disposable {
         return ts.getLineAndCharacterOfPosition(sourceFile, node.getStart());
     }
 
-    private _emitDescriptionHeader(sb: utils.SnippetStringBuilder) {
+    protected _emitDescriptionHeader(sb: utils.SnippetStringBuilder) {
         if (vs.workspace.getConfiguration().get("docthis.includeDescriptionTag", false)) {
             sb.append("@description ");
         }
@@ -248,7 +248,7 @@ export class Documenter implements vs.Disposable {
         return ts.getLineAndCharacterOfPosition(sourceFile, targetNode.getStart());
     }
 
-    private _emitClassDeclaration(sb: utils.SnippetStringBuilder, node: ts.ClassDeclaration) {
+    protected _emitClassDeclaration(sb: utils.SnippetStringBuilder, node: ts.ClassDeclaration) {
         this._emitDescriptionHeader(sb);
 
         this._emitModifiers(sb, node);
@@ -265,7 +265,7 @@ export class Documenter implements vs.Disposable {
         this._emitTypeParameters(sb, node);
     }
 
-    private _emitPropertyDeclaration(sb: utils.SnippetStringBuilder, node: ts.PropertyDeclaration | ts.AccessorDeclaration) {
+    protected _emitPropertyDeclaration(sb: utils.SnippetStringBuilder, node: ts.PropertyDeclaration | ts.AccessorDeclaration) {
         this._emitDescriptionHeader(sb);
 
         if (node.kind === ts.SyntaxKind.GetAccessor) {
@@ -323,7 +323,7 @@ export class Documenter implements vs.Disposable {
         this._emitMemberOf(sb, node.parent);
     }
 
-    private _emitMemberOf(sb: utils.SnippetStringBuilder, parent: ts.Node) {
+    protected _emitMemberOf(sb: utils.SnippetStringBuilder, parent: ts.Node) {
         let enabledForClasses = parent.kind === ts.SyntaxKind.ClassDeclaration && vs.workspace.getConfiguration().get("docthis.includeMemberOfOnClassMembers", true);
         let enabledForInterfaces = parent.kind === ts.SyntaxKind.InterfaceDeclaration && vs.workspace.getConfiguration().get("docthis.includeMemberOfOnInterfaceMembers", true);
         if (parent && (<any>parent)["name"] && (enabledForClasses || enabledForInterfaces)) {
@@ -332,16 +332,16 @@ export class Documenter implements vs.Disposable {
         }
     }
 
-    private _isNameBooleanLike(name: string): boolean {
+    protected _isNameBooleanLike(name: string): boolean {
         return /(?:is|has|can)[A-Z_]/.test(name);
     }
 
-    private _isNameFunctionLike(name: string): boolean {
+    protected _isNameFunctionLike(name: string): boolean {
         const fnNames = ["cb", "callback", "done", "next", "fn"];
         return fnNames.indexOf(name) !== -1;
     }
 
-    private _inferReturnTypeFromName(name: string): string {
+    protected _inferReturnTypeFromName(name: string): string {
         if (this._isNameBooleanLike(name)) {
             return "{boolean}";
         }
@@ -349,7 +349,7 @@ export class Documenter implements vs.Disposable {
         return "";
     }
 
-    private _emitReturns(sb: utils.SnippetStringBuilder, node: ts.MethodDeclaration | ts.FunctionDeclaration | ts.FunctionExpression | ts.ArrowFunction) {
+    protected _emitReturns(sb: utils.SnippetStringBuilder, node: ts.MethodDeclaration | ts.FunctionDeclaration | ts.FunctionExpression | ts.ArrowFunction) {
         if (utils.findNonVoidReturnInCurrentScope(node) || (node.type && node.type.getText() !== "void")) {
             sb.append("@returns");
             if (includeTypes() && node.type) {
@@ -367,7 +367,7 @@ export class Documenter implements vs.Disposable {
 
     }
 
-    private _inferParamTypeFromName(name: string): string {
+    protected _inferParamTypeFromName(name: string): string {
         if (this._isNameFunctionLike(name)) {
             return "{function}";
         }
@@ -379,7 +379,7 @@ export class Documenter implements vs.Disposable {
         return "{any}";
     }
 
-    private _emitParameters(sb: utils.SnippetStringBuilder, node:
+    protected _emitParameters(sb: utils.SnippetStringBuilder, node:
         ts.MethodDeclaration | ts.FunctionDeclaration | ts.ConstructorDeclaration | ts.FunctionExpression | ts.ArrowFunction) {
 
         if (!node.parameters) {
@@ -447,11 +447,11 @@ export class Documenter implements vs.Disposable {
         });
     }
 
-    private _isHungarianNotation(name: string): boolean {
+    protected _isHungarianNotation(name: string): boolean {
         return /^[abefimos][A-Z]/.test(name);
     }
 
-    private _getHungarianNotationType(name: string): string {
+    protected _getHungarianNotationType(name: string): string {
         switch (name.charAt(0)) {
             case "a": return "{Array}";
             case "b": return "{boolean}";
@@ -509,7 +509,7 @@ export class Documenter implements vs.Disposable {
         });
     }
 
-    private _emitModifiers(sb: utils.SnippetStringBuilder, node: ts.Node) {
+    protected _emitModifiers(sb: utils.SnippetStringBuilder, node: ts.Node) {
         if (!node.modifiers) {
             return;
         }

@@ -2,10 +2,15 @@ import * as vs from "vscode";
 import * as path from "path";
 
 import { Documenter } from "./documenter";
+import { PhpDocumenter } from "./php_documenter";
 
 let documenter: Documenter;
 
-function lazyInitializeDocumenter() {
+function lazyInitializeDocumenter(document: vs.TextDocument) {
+    if (document.languageId === "php" && !documenter) {
+        documenter = new PhpDocumenter();
+        return;
+    }
     if (!documenter) {
         documenter = new Documenter();
     }
@@ -17,6 +22,7 @@ function languageIsSupported(document: vs.TextDocument) {
         document.languageId === "vue" ||
         document.languageId === "javascriptreact" ||
         document.languageId === "typescriptreact" ||
+        document.languageId === "php" ||
         path.extname(document.fileName) === ".vue");
 }
 
@@ -35,7 +41,7 @@ function runCommand(commandName: string, document: vs.TextDocument, implFunc: ()
     }
 
     try {
-        lazyInitializeDocumenter();
+        lazyInitializeDocumenter(document);
         implFunc();
     }
     catch (e) {
@@ -65,7 +71,7 @@ export function activate(context: vs.ExtensionContext): void {
 
         const change = e.contentChanges[0];
         if (change.text === "* */") {
-            lazyInitializeDocumenter();
+            lazyInitializeDocumenter(vs.window.activeTextEditor.document);
             setTimeout(() => {
                 try {
                     documenter.automaticDocument(editor);
