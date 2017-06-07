@@ -93,7 +93,7 @@
         },
         "docthis.authorName": {
           "type": "string",
-          "default": "Firstname Name - <e-mail@address.com>",
+          "default": "(Set the text for this tag by adding docthis.authorName to your settings file.)",
           "description": "When docthis.includeAuthorTag is enabled, will display @author tag with the value set here."
         }
       }

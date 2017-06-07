@@ -110,7 +110,7 @@ export class Documenter implements vs.Disposable {
 
     private _printNodeInfo(node: ts.Node, sourceFile: ts.SourceFile) {
         const sb = new utils.StringBuilder();
-        sb.append(`${node.getStart()} to ${node.getEnd()} --- (${node.kind}) ${(<any>ts).SyntaxKind[node.kind]}`);
+        sb.append(`${ node.getStart() } to ${ node.getEnd() } --- (${node.kind}) ${ (<any>ts).SyntaxKind[node.kind] }`);
 
         if (node.parent) {
             const nodeIndex = node.parent.getChildren().indexOf(node);
@@ -217,7 +217,7 @@ export class Documenter implements vs.Disposable {
 
     private _emitAuthor(sb: utils.SnippetStringBuilder) {
         if (vs.workspace.getConfiguration().get("docthis.includeAuthorTag", false)) {
-            let author: string = vs.workspace.getConfiguration().get("docthis.authorName", "-- SET AUTHOR VALUE IN CONFIGURATION docthis.authorDefault--");
+            let author: string = vs.workspace.getConfiguration().get("docthis.authorName");
             sb.append("@author " + author);
         }
         else {
@@ -270,7 +270,7 @@ export class Documenter implements vs.Disposable {
         sb.append("@class");
 
         if (node.name) {
-            sb.append(` ${node.name.getText()}`);
+            sb.append(` ${ node.name.getText() }`);
         }
 
         sb.appendLine();
@@ -299,9 +299,9 @@ export class Documenter implements vs.Disposable {
         // JSDoc fails to emit documentation for arrow function syntax. (https://github.com/jsdoc3/jsdoc/issues/1100)
         if (includeTypes()) {
             if (node.type && node.type.getText().indexOf("=>") === -1) {
-                sb.append(`@type ${utils.formatTypeName(node.type.getText())}`);
+                sb.append(`@type ${ utils.formatTypeName(node.type.getText()) }`);
             } else if (enableHungarianNotationEvaluation() && this._isHungarianNotation(node.name.getText())) {
-                sb.append(`@type ${this._getHungarianNotationType(node.name.getText())}`);
+                sb.append(`@type ${ this._getHungarianNotationType(node.name.getText()) }`);
             }
         }
 
@@ -314,7 +314,7 @@ export class Documenter implements vs.Disposable {
 
         this._emitModifiers(sb, node);
 
-        sb.appendLine(`@interface ${node.name.getText()}`);
+        sb.appendLine(`@interface ${ node.name.getText() }`);
 
         this._emitHeritageClauses(sb, node);
         this._emitTypeParameters(sb, node);
@@ -498,7 +498,7 @@ export class Documenter implements vs.Disposable {
         }
 
         node.typeParameters.forEach(parameter => {
-            sb.append(`@template ${parameter.name.getText()} `);
+            sb.append(`@template ${ parameter.name.getText() } `);
             sb.appendSnippetTabstop();
             sb.appendLine();
         });
@@ -520,7 +520,7 @@ export class Documenter implements vs.Disposable {
                     tn += ">";
                 }
 
-                sb.append(`${heritageType} ${utils.formatTypeName(tn)}`);
+                sb.append(`${ heritageType } ${ utils.formatTypeName(tn) }`);
                 sb.appendLine();
             });
         });
