@@ -263,7 +263,6 @@ export class Documenter implements vs.Disposable {
 
     private _emitClassDeclaration(sb: utils.SnippetStringBuilder, node: ts.ClassDeclaration) {
         this._emitDescriptionHeader(sb);
-        this._emitAuthor(sb);
 
         this._emitModifiers(sb, node);
 
@@ -310,7 +309,6 @@ export class Documenter implements vs.Disposable {
 
     private _emitInterfaceDeclaration(sb: utils.SnippetStringBuilder, node: ts.InterfaceDeclaration) {
         this._emitDescriptionHeader(sb);
-        this._emitAuthor(sb);
 
         this._emitModifiers(sb, node);
 
@@ -330,7 +328,6 @@ export class Documenter implements vs.Disposable {
 
     private _emitMethodDeclaration(sb: utils.SnippetStringBuilder, node: ts.MethodDeclaration | ts.FunctionDeclaration) {
         this._emitDescriptionHeader(sb);
-        this._emitAuthor(sb);
 
         this._emitModifiers(sb, node);
         this._emitTypeParameters(sb, node);
@@ -486,7 +483,6 @@ export class Documenter implements vs.Disposable {
             (<ts.ClassDeclaration>node.parent).name.getText()
             }.`);
         sb.appendLine();
-        this._emitAuthor(sb);
 
         this._emitParameters(sb, node);
         this._emitMemberOf(sb, node.parent);
