@@ -215,6 +215,19 @@ export class Documenter implements vs.Disposable {
         sb.appendLine();
     }
 
+    private _emitAuthor(sb: utils.SnippetStringBuilder) {
+        if (vs.workspace.getConfiguration().get("docthis.includeAuthorTag", false)) {
+            let author: string = vs.workspace.getConfiguration().get("docthis.authorName");
+            sb.append("@author " + author);
+        }
+        else {
+            sb.append("");
+        }
+
+        sb.appendSnippetTabstop();
+        sb.appendLine();
+    }
+
     private _emitVariableDeclaration(sb: utils.SnippetStringBuilder, node: ts.VariableDeclaration, sourceFile: ts.SourceFile) {
         for (const child of node.getChildren()) {
             const result = this._documentNode(sb, child, sourceFile);
