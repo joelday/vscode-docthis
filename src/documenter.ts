@@ -205,16 +205,14 @@ export class Documenter implements vs.Disposable {
     private _emitDescriptionHeader(sb: utils.SnippetStringBuilder) {
         if (vs.workspace.getConfiguration().get("docthis.includeDescriptionTag", false)) {
             sb.append("@description ");
-        }
-        else {
-            sb.append("");
-        }
+            sb.appendSnippetTabstop();
+            sb.appendLine();
+        } else {
+            // we don't want description tag, probably because we want to free type the description. So add space for that.
+            sb.appendSnippetTabstop();
+            sb.appendLine();
 
-        sb.appendSnippetTabstop();
-        sb.appendLine();
-
-        //jump a line after description tag if set
-        if (vs.workspace.getConfiguration().get("docthis.jumpLineAfterDescriptionTag", false)) {
+            // jump a line after description free-type area before showing other tags
             sb.appendLine();
         }
     }
@@ -223,10 +221,9 @@ export class Documenter implements vs.Disposable {
         if (vs.workspace.getConfiguration().get("docthis.includeAuthorTag", false)) {
             let author: string = vs.workspace.getConfiguration().get("docthis.authorName", "");
             sb.append("@author " + author);
+            sb.appendSnippetTabstop();
+            sb.appendLine();
         }
-
-        sb.appendSnippetTabstop();
-        sb.appendLine();
     }
 
     private _emitVariableDeclaration(sb: utils.SnippetStringBuilder, node: ts.VariableDeclaration, sourceFile: ts.SourceFile) {
@@ -344,7 +341,6 @@ export class Documenter implements vs.Disposable {
         let enabledForClasses = parent.kind === ts.SyntaxKind.ClassDeclaration && vs.workspace.getConfiguration().get("docthis.includeMemberOfOnClassMembers", true);
         let enabledForInterfaces = parent.kind === ts.SyntaxKind.InterfaceDeclaration && vs.workspace.getConfiguration().get("docthis.includeMemberOfOnInterfaceMembers", true);
         if (parent && (<any>parent)["name"] && (enabledForClasses || enabledForInterfaces)) {
-            sb.appendLine();
             sb.appendLine("@memberof " + (<any>parent)["name"].text);
         }
     }
