@@ -212,16 +212,17 @@ export class Documenter implements vs.Disposable {
 
         sb.appendSnippetTabstop();
         sb.appendLine();
-        sb.appendLine();
+
+        //jump a line after description tag if set
+        if (vs.workspace.getConfiguration().get("docthis.jumpLineAfterDescriptionTag", false)) {
+            sb.appendLine();
+        }
     }
 
     private _emitAuthor(sb: utils.SnippetStringBuilder) {
         if (vs.workspace.getConfiguration().get("docthis.includeAuthorTag", false)) {
-            let author: string = vs.workspace.getConfiguration().get("docthis.authorName", "-- SET AUTHOR VALUE IN CONFIGURATION docthis.authorDefault--");
+            let author: string = vs.workspace.getConfiguration().get("docthis.authorName", "");
             sb.append("@author " + author);
-        }
-        else {
-            sb.append("");
         }
 
         sb.appendSnippetTabstop();

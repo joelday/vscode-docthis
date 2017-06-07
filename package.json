@@ -76,6 +76,11 @@
           "default": false,
           "description": "When enabled, JSDoc comments for functions and methods will include @description."
         },
+        "docthis.jumpLineAfterDescriptionTag": {
+          "type": "boolean",
+          "default": true,
+          "description": "When enabled, An extra line will be added after the description tag."
+        },
         "docthis.enableHungarianNotationEvaluation": {
           "type": "boolean",
           "default": false,
