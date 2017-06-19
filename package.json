@@ -89,12 +89,12 @@
         "docthis.includeAuthorTag": {
           "type": "boolean",
           "default": false,
-          "description": "When enabled, will display the @author JSDoc tag, see config -> docthis.authorName ."
+          "description": "When enabled, will add the @author tag."
         },
         "docthis.authorName": {
           "type": "string",
           "default": "(Set the text for this tag by adding docthis.authorName to your settings file.)",
-          "description": "When docthis.includeAuthorTag is enabled, will display @author tag with the value set here."
+          "description": "When docthis.includeAuthorTag is enabled, will add @author tag with this value."
         }
       }
     }
