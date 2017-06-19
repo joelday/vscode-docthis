@@ -1,3 +1,7 @@
+### 0.4.5
+- Add support of @author tag. Controlled using `docthis.includeAuthorTag` and `docthis.authorName` options.
+- No more unecessary jump lines for other tags than @description (to match use from usejsdoc.org)
+
 ### 0.4.4
 - Change casing of @memberof to all lower-case.
 
