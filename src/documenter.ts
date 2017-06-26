@@ -297,9 +297,9 @@ export class Documenter implements vs.Disposable {
         // JSDoc fails to emit documentation for arrow function syntax. (https://github.com/jsdoc3/jsdoc/issues/1100)
         if (includeTypes()) {
             if (node.type && node.type.getText().indexOf("=>") === -1) {
-                sb.append(`@type ${ utils.formatTypeName(node.type.getText()) }`);
+                sb.appendLine(`@type ${ utils.formatTypeName(node.type.getText()) }`);
             } else if (enableHungarianNotationEvaluation() && this._isHungarianNotation(node.name.getText())) {
-                sb.append(`@type ${ this._getHungarianNotationType(node.name.getText()) }`);
+                sb.appendLine(`@type ${ this._getHungarianNotationType(node.name.getText()) }`);
             }
         }
 
