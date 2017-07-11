@@ -1,3 +1,9 @@
+### 0.4.7
+- Protecting against error for /** auto documentation.
+
+### 0.4.6
+- Fix @type and @memberOf being emitted on the same line.
+
 ### 0.4.5
 - Add support of @author tag. Controlled using `docthis.includeAuthorTag` and `docthis.authorName` options.
 - No more unecessary jump lines for other tags than @description (to match use from usejsdoc.org)
