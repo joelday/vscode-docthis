@@ -64,7 +64,7 @@ export function activate(context: vs.ExtensionContext): void {
         }
 
         const change = e.contentChanges[0];
-        if (change.text === "* */") {
+        if (change && change.text === "* */") {
             lazyInitializeDocumenter();
             setTimeout(() => {
                 try {
