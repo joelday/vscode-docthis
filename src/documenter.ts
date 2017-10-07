@@ -241,7 +241,8 @@ export class Documenter implements vs.Disposable {
         let targetNode = node.parent;
 
         if (node.parent.kind !== ts.SyntaxKind.PropertyAssignment &&
-            node.parent.kind !== ts.SyntaxKind.BinaryExpression) {
+            node.parent.kind !== ts.SyntaxKind.BinaryExpression &&
+            node.parent.kind !== ts.SyntaxKind.PropertyDeclaration) {
 
             targetNode = utils.findFirstParent(targetNode, [ts.SyntaxKind.VariableDeclarationList, ts.SyntaxKind.VariableDeclaration]);
             if (!targetNode) {
