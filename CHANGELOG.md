@@ -1,3 +1,6 @@
+### 0.5.0
+- Support documentation generation for class methods.
+
 ### 0.4.7
 - Protecting against error for /** auto documentation.
 
