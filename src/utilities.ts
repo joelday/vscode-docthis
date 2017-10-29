@@ -229,15 +229,10 @@ export class SnippetStringBuilder {
         return this;
     }
 
-    toCommentValue(includeEndcaps = true) {
+    toCommentValue() {
         let sb = new StringBuilder();
 
-        if (includeEndcaps) {
-            sb.appendLine("/**");
-        }
-        else {
-            sb.appendLine();
-        }
+        sb.appendLine("/**");
 
         const lines = this._snippet.value.split("\n");
         lines.forEach((line, i) => {
@@ -249,9 +244,7 @@ export class SnippetStringBuilder {
             sb.appendLine(line);
         });
 
-        if (includeEndcaps) {
-            sb.appendLine(" */");
-        }
+        sb.appendLine(" */");
 
         return new vs.SnippetString(sb.toString());
     }

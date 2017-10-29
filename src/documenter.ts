@@ -3,6 +3,7 @@ import * as ts from "typescript";
 import * as utils from "./utilities";
 
 import { LanguageServiceHost } from "./languageServiceHost";
+import { Range } from "vscode";
 
 function includeTypes() {
     return vs.workspace.getConfiguration().get("docthis.includeTypes", true);
@@ -29,31 +30,7 @@ export class Documenter implements vs.Disposable {
             this._languageServiceHost, ts.createDocumentRegistry());
     }
 
-    automaticDocument(editor: vs.TextEditor) {
-        const selection = editor.selection;
-        const caret = selection.start;
-
-        const sourceFile = this._getSourceFile(editor.document);
-
-        const position = ts.getPositionOfLineAndCharacter(sourceFile, caret.line, caret.character);
-        const node = utils.findChildForPosition(sourceFile, position);
-        const documentNode = utils.nodeIsOfKind(node) ? node : utils.findFirstParent(node);
-
-        const sb = new utils.SnippetStringBuilder();
-
-        const foundLocation = this._documentNode(sb, documentNode, sourceFile);
-        if (foundLocation) {
-            const foundLocationOffset = editor.document.offsetAt(new vs.Position(foundLocation.line, foundLocation.character));
-            const caretOffset = editor.document.offsetAt(caret);
-            if (caretOffset > foundLocationOffset) {
-                return;
-            }
-
-            this._insertDocumentation(sb, caret, editor, false);
-        }
-    }
-
-    documentThis(editor: vs.TextEditor, commandName: string) {
+    documentThis(editor: vs.TextEditor, commandName: string, forCompletion: boolean) {
         const sourceFile = this._getSourceFile(editor.document);
 
         const selection = editor.selection;
@@ -64,17 +41,18 @@ export class Documenter implements vs.Disposable {
         const documentNode = utils.nodeIsOfKind(node) ? node : utils.findFirstParent(node);
 
         if (!documentNode) {
-            this._showFailureMessage(commandName, "at the current caret position");
+            this._showFailureMessage(commandName, "at the current position");
             return;
         }
 
         const sb = new utils.SnippetStringBuilder();
 
         const docLocation = this._documentNode(sb, documentNode, sourceFile);
+
         if (docLocation) {
-            this._insertDocumentation(sb, docLocation, editor, true);
+            this._insertDocumentation(sb, docLocation, editor, forCompletion);
         } else {
-            this._showFailureMessage(commandName, "at the current caret position");
+            this._showFailureMessage(commandName, "at the current position");
         }
     }
 
@@ -136,9 +114,13 @@ export class Documenter implements vs.Disposable {
         vs.window.showErrorMessage(`Sorry! '${commandName}' wasn't able to produce documentation ${condition}.`);
     }
 
-    private _insertDocumentation(sb: utils.SnippetStringBuilder, location: ts.LineAndCharacter, editor: vs.TextEditor, withEndCaps = true) {
-        const position = new vs.Position(location.line, location.character);
-        editor.insertSnippet(sb.toCommentValue(withEndCaps), position);
+    private _insertDocumentation(sb: utils.SnippetStringBuilder, location: ts.LineAndCharacter, editor: vs.TextEditor, forCompletion: boolean) {
+        const startPosition = new vs.Position(forCompletion ? location.line - 1 : location.line, location.character);
+        const endPosition = new vs.Position(location.line, location.character);
+
+        const range = new Range(startPosition, endPosition);
+
+        editor.insertSnippet(sb.toCommentValue(), range);
     }
 
     private _getSourceFile(document: vs.TextDocument) {
@@ -162,7 +144,7 @@ export class Documenter implements vs.Disposable {
         return sourceFile;
     }
 
-    private _documentNode(sb: utils.SnippetStringBuilder, node: ts.Node, sourceFile: ts.SourceFile) {
+    private _documentNode(sb: utils.SnippetStringBuilder, node: ts.Node, sourceFile: ts.SourceFile): ts.LineAndCharacter {
         switch (node.kind) {
             case ts.SyntaxKind.ClassDeclaration:
                 this._emitClassDeclaration(sb, <ts.ClassDeclaration>node);

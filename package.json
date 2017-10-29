@@ -2,7 +2,7 @@
   "name": "docthis",
   "displayName": "Document This",
   "description": "Automatically generates detailed JSDoc comments in TypeScript and JavaScript files.",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "publisher": "joelday",
   "icon": "images/icon.png",
   "galleryBanner": {
@@ -12,7 +12,7 @@
   "license": "MIT",
   "licenseUrl": "LICENSE",
   "engines": {
-    "vscode": "^1.9.0"
+    "vscode": "^1.16.0"
   },
   "categories": [
     "Other",
@@ -51,11 +51,6 @@
       "type": "object",
       "title": "Document This configuration",
       "properties": {
-        "docthis.automaticForBlockComments": {
-          "type": "boolean",
-          "default": true,
-          "description": "When enabled, typing /** triggers documentation automatically."
-        },
         "docthis.includeTypes": {
           "type": "boolean",
           "default": true,
@@ -108,8 +103,7 @@
   "devDependencies": {
     "@types/mocha": "^2.2.37",
     "@types/node": "^6.0.59",
-    "tslint": "^4.3.1",
-    "vscode": "^1.0.3"
+    "tslint": "^4.3.1"
   },
   "dependencies": {
     "typescript": "^2.2.0"

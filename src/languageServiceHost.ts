@@ -1,7 +1,4 @@
-import * as vs from "vscode";
-import * as path from "path";
 import * as ts from "typescript";
-import * as utils from "./utilities";
 
 export class LanguageServiceHost implements ts.LanguageServiceHost {
     private _files: ts.Map<{ text: string; version: number; }>;
@@ -37,8 +34,7 @@ export class LanguageServiceHost implements ts.LanguageServiceHost {
     }
 
     getCurrentDirectory() {
-        return vs.workspace.rootPath ?
-            utils.fixWinPath(path.resolve(vs.workspace.rootPath)) : process.cwd();
+        return process.cwd();
     }
 
     getDefaultLibFileName(options: ts.CompilerOptions) {
