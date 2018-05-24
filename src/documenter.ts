@@ -208,6 +208,14 @@ export class Documenter implements vs.Disposable {
         }
     }
 
+    private _emitDate(sb: utils.SnippetStringBuilder) {
+        if (vs.workspace.getConfiguration().get("docthis.includeDateTag", false)) {
+            sb.append("@date " + utils.getCurrentDate());
+            sb.appendSnippetTabstop();
+            sb.appendLine();
+        }
+    }
+
     private _emitVariableDeclaration(sb: utils.SnippetStringBuilder, node: ts.VariableDeclaration, sourceFile: ts.SourceFile) {
         for (const child of node.getChildren()) {
             const result = this._documentNode(sb, child, sourceFile);
@@ -245,6 +253,7 @@ export class Documenter implements vs.Disposable {
     private _emitClassDeclaration(sb: utils.SnippetStringBuilder, node: ts.ClassDeclaration) {
         this._emitDescriptionHeader(sb);
         this._emitAuthor(sb);
+        this._emitDate(sb);
 
         this._emitModifiers(sb, node);
 
@@ -292,6 +301,7 @@ export class Documenter implements vs.Disposable {
     private _emitInterfaceDeclaration(sb: utils.SnippetStringBuilder, node: ts.InterfaceDeclaration) {
         this._emitDescriptionHeader(sb);
         this._emitAuthor(sb);
+        this._emitDate(sb);
 
         this._emitModifiers(sb, node);
 
@@ -312,6 +322,7 @@ export class Documenter implements vs.Disposable {
     private _emitMethodDeclaration(sb: utils.SnippetStringBuilder, node: ts.MethodDeclaration | ts.FunctionDeclaration) {
         this._emitDescriptionHeader(sb);
         this._emitAuthor(sb);
+        this._emitDate(sb);
 
         this._emitModifiers(sb, node);
         this._emitTypeParameters(sb, node);
@@ -467,6 +478,7 @@ export class Documenter implements vs.Disposable {
             }.`);
         sb.appendLine();
         this._emitAuthor(sb);
+        this._emitDate(sb);
 
         this._emitParameters(sb, node);
         this._emitMemberOf(sb, node.parent);

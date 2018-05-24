@@ -90,6 +90,11 @@
           "type": "string",
           "default": "(Set the text for this tag by adding docthis.authorName to your settings file.)",
           "description": "When docthis.includeAuthorTag is enabled, will add @author tag with this value."
+        },
+        "docthis.includeDateTag": {
+          "type": "boolean",
+          "default": false,
+          "description": "When enabled, will add the @date tag in YYYY-MM-DD format."
         }
       }
     }
