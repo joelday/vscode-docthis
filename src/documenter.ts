@@ -186,7 +186,7 @@ export class Documenter implements vs.Disposable {
 
     private _emitDescriptionHeader(sb: utils.SnippetStringBuilder) {
         if (vs.workspace.getConfiguration().get("docthis.includeDescriptionTag", false)) {
-            sb.append("@description ");
+            sb.append("@description");
             sb.appendSnippetTabstop();
             sb.appendLine();
         } else {
@@ -202,7 +202,7 @@ export class Documenter implements vs.Disposable {
     private _emitAuthor(sb: utils.SnippetStringBuilder) {
         if (vs.workspace.getConfiguration().get("docthis.includeAuthorTag", false)) {
             let author: string = vs.workspace.getConfiguration().get("docthis.authorName", "");
-            sb.append("@author " + author);
+            sb.append("@author" + author);
             sb.appendSnippetTabstop();
             sb.appendLine();
         }
@@ -210,7 +210,7 @@ export class Documenter implements vs.Disposable {
 
     private _emitDate(sb: utils.SnippetStringBuilder) {
         if (vs.workspace.getConfiguration().get("docthis.includeDateTag", false)) {
-            sb.append("@date " + utils.getCurrentDate());
+            sb.append("@date" + utils.getCurrentDate());
             sb.appendSnippetTabstop();
             sb.appendLine();
         }
@@ -366,7 +366,6 @@ export class Documenter implements vs.Disposable {
                 sb.append(" " + this._inferReturnTypeFromName(node.name.getText()));
             }
 
-            sb.append(" ");
             sb.appendSnippetTabstop();
 
             sb.appendLine();
@@ -383,7 +382,7 @@ export class Documenter implements vs.Disposable {
             return "{boolean}";
         }
 
-        return "{any}";
+        return "{*}";
     }
 
     private _emitParameters(sb: utils.SnippetStringBuilder, node:
@@ -399,7 +398,7 @@ export class Documenter implements vs.Disposable {
             const isArgs = !!parameter.dotDotDotToken;
             const initializerValue = parameter.initializer ? parameter.initializer.getText() : null;
 
-            let typeName = "{any}";
+            let typeName = "{*}";
 
             if (includeTypes()) {
                 if (parameter.initializer && !parameter.type) {
@@ -447,7 +446,6 @@ export class Documenter implements vs.Disposable {
                 sb.append("]");
             }
 
-            sb.append(" ");
             sb.appendSnippetTabstop();
 
             sb.appendLine();
@@ -468,7 +466,7 @@ export class Documenter implements vs.Disposable {
             case "m": return "{Object}"; // Map
             case "o": return "{Object}";
             case "s": return "{string}";
-            default: return "{any}";
+            default: return "{*}";
         }
     }
 
@@ -490,7 +488,7 @@ export class Documenter implements vs.Disposable {
         }
 
         node.typeParameters.forEach(parameter => {
-            sb.append(`@template ${ parameter.name.getText() } `);
+            sb.append(`@template ${ parameter.name.getText() }`);
             sb.appendSnippetTabstop();
             sb.appendLine();
         });

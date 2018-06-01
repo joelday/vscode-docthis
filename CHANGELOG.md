@@ -1,6 +1,10 @@
+### 0.6.1
+- Removing trailing spaces from snippet output.
+- Adding @mbaric1's date tag support.
+
 ### 0.6.0
 - Now uses a completion provider instead of automatic insertion when typing '/**'.
-No longer conflicts with VSCode's built in JSDoc generation!
+- No longer conflicts with VSCode's built in JSDoc generation!
 
 ### 0.5.0
 - Support documentation generation for class methods.

@@ -240,7 +240,13 @@ export class SnippetStringBuilder {
                 return;
             }
 
-            sb.append(" * ");
+            sb.append(" *");
+
+            // If it's a blank line or only an initial tab stop, skip adding the trailing space.
+            if (line !== "" && !line.startsWith("$")) {
+                sb.append(" ");
+            }
+
             sb.appendLine(line);
         });
 

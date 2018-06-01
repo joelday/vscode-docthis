@@ -73,8 +73,10 @@ class DocThisCompletionItem extends CompletionItem {
 }
 
 export function activate(context: vs.ExtensionContext): void {
+    const languageEntries = languages.map(l => ({ scheme: "file", language: l }));
+
     context.subscriptions.push(vs.languages.registerCompletionItemProvider(
-        languages,
+        languageEntries,
         {
             provideCompletionItems: (document: TextDocument, position: Position, token: CancellationToken) => {
                 const line = document.lineAt(position.line).text;
