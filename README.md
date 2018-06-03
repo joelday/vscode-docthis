@@ -6,7 +6,7 @@
 ![Demo](images/demo.gif)
 
 # Tags
-Supports JSDoc and Closure Compiler tags: @class, @description, @enum, @export, @function, @implements, @interface, @param, @private, @returns, @static, @template, @type and @memberOf.
+Supports JSDoc and Closure Compiler tags: @class, @description, @enum, @export, @function, @implements, @interface, @param, @private, @returns, @static, @template, @type, @memberOf and @date.
 
 # Commands
 ## Document This
