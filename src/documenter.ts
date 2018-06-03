@@ -202,7 +202,7 @@ export class Documenter implements vs.Disposable {
     private _emitAuthor(sb: utils.SnippetStringBuilder) {
         if (vs.workspace.getConfiguration().get("docthis.includeAuthorTag", false)) {
             let author: string = vs.workspace.getConfiguration().get("docthis.authorName", "");
-            sb.append("@author" + author);
+            sb.append("@author " + author);
             sb.appendSnippetTabstop();
             sb.appendLine();
         }
@@ -210,7 +210,7 @@ export class Documenter implements vs.Disposable {
 
     private _emitDate(sb: utils.SnippetStringBuilder) {
         if (vs.workspace.getConfiguration().get("docthis.includeDateTag", false)) {
-            sb.append("@date" + utils.getCurrentDate());
+            sb.append("@date " + utils.getCurrentDate());
             sb.appendSnippetTabstop();
             sb.appendLine();
         }
