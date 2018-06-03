@@ -1,4 +1,7 @@
-### 0.6.1
+### 0.7.1
+- Trailing space regression fix.
+
+### 0.7.0
 - Removing trailing spaces from snippet output.
 - Adding @mbaric1's date tag support.
 
