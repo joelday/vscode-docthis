@@ -471,7 +471,7 @@ export class Documenter implements vs.Disposable {
     }
 
     private _emitConstructorDeclaration(sb: utils.SnippetStringBuilder, node: ts.ConstructorDeclaration) {
-        sb.appendSnippetPlaceholder(`Creates an instance of ${
+        sb.appendSnippetPlaceholder(` Creates an instance of ${
             (<ts.ClassDeclaration>node.parent).name.getText()
             }.`);
         sb.appendLine();
