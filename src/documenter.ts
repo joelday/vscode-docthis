@@ -164,6 +164,7 @@ export class Documenter implements vs.Disposable {
             case ts.SyntaxKind.EnumMember:
                 sb.appendLine();
                 break;
+            case ts.SyntaxKind.CallSignature:
             case ts.SyntaxKind.FunctionDeclaration:
             case ts.SyntaxKind.MethodDeclaration:
             case ts.SyntaxKind.MethodSignature:
