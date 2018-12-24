@@ -2,7 +2,7 @@
   "name": "docthis",
   "displayName": "Document This",
   "description": "Automatically generates detailed JSDoc comments in TypeScript and JavaScript files.",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "publisher": "joelday",
   "icon": "images/icon.png",
   "galleryBanner": {
@@ -86,6 +86,16 @@
           "default": false,
           "description": "When enabled, will add the @author tag."
         },
+        "docthis.includeSinceTag": {
+          "type": "boolean",
+          "default": false,
+          "description": "When enabled, will add the @since tag"
+        },
+        "docthis.alwaysIncludeSince": {
+          "type": "boolean",
+          "default": false,
+          "description": "When enabled, will ALWAYS include @since tag, instead of only in public"
+        },
         "docthis.authorName": {
           "type": "string",
           "default": "(Set the text for this tag by adding docthis.authorName to your settings file.)",
@@ -112,6 +122,7 @@
     "vscode": "^1.1.18"
   },
   "dependencies": {
+    "pkg-up": "^2.0.0",
     "typescript": "^2.9.1"
   },
   "bugs": {

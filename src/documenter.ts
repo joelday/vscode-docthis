@@ -1,6 +1,8 @@
 import * as vs from "vscode";
 import * as ts from "typescript";
 import * as utils from "./utilities";
+import * as pkgUp from "pkg-up";
+import { readFileSync } from "fs";
 
 import { LanguageServiceHost } from "./languageServiceHost";
 import { Range } from "vscode";
@@ -88,7 +90,7 @@ export class Documenter implements vs.Disposable {
 
     private _printNodeInfo(node: ts.Node, sourceFile: ts.SourceFile) {
         const sb = new utils.StringBuilder();
-        sb.append(`${ node.getStart() } to ${ node.getEnd() } --- (${node.kind}) ${ (<any>ts).SyntaxKind[node.kind] }`);
+        sb.append(`${node.getStart()} to ${node.getEnd()} --- (${node.kind}) ${(<any>ts).SyntaxKind[node.kind]}`);
 
         if (node.parent) {
             const nodeIndex = node.parent.getChildren().indexOf(node);
@@ -147,19 +149,19 @@ export class Documenter implements vs.Disposable {
     private _documentNode(sb: utils.SnippetStringBuilder, node: ts.Node, sourceFile: ts.SourceFile): ts.LineAndCharacter {
         switch (node.kind) {
             case ts.SyntaxKind.ClassDeclaration:
-                this._emitClassDeclaration(sb, <ts.ClassDeclaration>node);
+                this._emitClassDeclaration(sb, <ts.ClassDeclaration>node, sourceFile);
                 break;
             case ts.SyntaxKind.PropertyDeclaration:
             case ts.SyntaxKind.PropertySignature:
             case ts.SyntaxKind.GetAccessor:
             case ts.SyntaxKind.SetAccessor:
-                this._emitPropertyDeclaration(sb, <ts.AccessorDeclaration>node);
+                this._emitPropertyDeclaration(sb, <ts.AccessorDeclaration>node, sourceFile);
                 break;
             case ts.SyntaxKind.InterfaceDeclaration:
-                this._emitInterfaceDeclaration(sb, <ts.InterfaceDeclaration>node);
+                this._emitInterfaceDeclaration(sb, <ts.InterfaceDeclaration>node, sourceFile);
                 break;
             case ts.SyntaxKind.EnumDeclaration:
-                this._emitEnumDeclaration(sb, <ts.EnumDeclaration>node);
+                this._emitEnumDeclaration(sb, <ts.EnumDeclaration>node, sourceFile);
                 break;
             case ts.SyntaxKind.EnumMember:
                 sb.appendLine();
@@ -167,7 +169,7 @@ export class Documenter implements vs.Disposable {
             case ts.SyntaxKind.FunctionDeclaration:
             case ts.SyntaxKind.MethodDeclaration:
             case ts.SyntaxKind.MethodSignature:
-                this._emitMethodDeclaration(sb, <ts.MethodDeclaration>node);
+                this._emitMethodDeclaration(sb, <ts.MethodDeclaration>node, sourceFile);
                 break;
             case ts.SyntaxKind.Constructor:
                 this._emitConstructorDeclaration(sb, <ts.ConstructorDeclaration>node);
@@ -250,9 +252,10 @@ export class Documenter implements vs.Disposable {
         return ts.getLineAndCharacterOfPosition(sourceFile, targetNode.getStart());
     }
 
-    private _emitClassDeclaration(sb: utils.SnippetStringBuilder, node: ts.ClassDeclaration) {
+    private _emitClassDeclaration(sb: utils.SnippetStringBuilder, node: ts.ClassDeclaration, sourceFile: ts.SourceFile) {
         this._emitDescriptionHeader(sb);
         this._emitAuthor(sb);
+        this._emitSince(sb, node, sourceFile);
         this._emitDate(sb);
 
         this._emitModifiers(sb, node);
@@ -260,7 +263,7 @@ export class Documenter implements vs.Disposable {
         sb.append("@class");
 
         if (node.name) {
-            sb.append(` ${ node.name.getText() }`);
+            sb.append(` ${node.name.getText()}`);
         }
 
         sb.appendLine();
@@ -269,7 +272,7 @@ export class Documenter implements vs.Disposable {
         this._emitTypeParameters(sb, node);
     }
 
-    private _emitPropertyDeclaration(sb: utils.SnippetStringBuilder, node: ts.PropertyDeclaration | ts.AccessorDeclaration) {
+    private _emitPropertyDeclaration(sb: utils.SnippetStringBuilder, node: ts.PropertyDeclaration | ts.AccessorDeclaration, sourceFile: ts.SourceFile) {
         this._emitDescriptionHeader(sb);
 
         if (node.kind === ts.SyntaxKind.GetAccessor) {
@@ -289,29 +292,30 @@ export class Documenter implements vs.Disposable {
         // JSDoc fails to emit documentation for arrow function syntax. (https://github.com/jsdoc3/jsdoc/issues/1100)
         if (includeTypes()) {
             if (node.type && node.type.getText().indexOf("=>") === -1) {
-                sb.appendLine(`@type ${ utils.formatTypeName(node.type.getText()) }`);
+                sb.appendLine(`@type ${utils.formatTypeName(node.type.getText())}`);
             } else if (enableHungarianNotationEvaluation() && this._isHungarianNotation(node.name.getText())) {
-                sb.appendLine(`@type ${ this._getHungarianNotationType(node.name.getText()) }`);
+                sb.appendLine(`@type ${this._getHungarianNotationType(node.name.getText())}`);
             }
         }
 
         this._emitMemberOf(sb, node.parent);
     }
 
-    private _emitInterfaceDeclaration(sb: utils.SnippetStringBuilder, node: ts.InterfaceDeclaration) {
+    private _emitInterfaceDeclaration(sb: utils.SnippetStringBuilder, node: ts.InterfaceDeclaration, sourceFile: ts.SourceFile) {
         this._emitDescriptionHeader(sb);
         this._emitAuthor(sb);
+        this._emitSince(sb, node, sourceFile);
         this._emitDate(sb);
 
         this._emitModifiers(sb, node);
 
-        sb.appendLine(`@interface ${ node.name.getText() }`);
+        sb.appendLine(`@interface ${node.name.getText()}`);
 
         this._emitHeritageClauses(sb, node);
         this._emitTypeParameters(sb, node);
     }
 
-    private _emitEnumDeclaration(sb: utils.SnippetStringBuilder, node: ts.EnumDeclaration) {
+    private _emitEnumDeclaration(sb: utils.SnippetStringBuilder, node: ts.EnumDeclaration, sourceFile: ts.SourceFile) {
         this._emitDescriptionHeader(sb);
 
         this._emitModifiers(sb, node);
@@ -319,10 +323,11 @@ export class Documenter implements vs.Disposable {
         sb.appendLine(`@enum {number}`);
     }
 
-    private _emitMethodDeclaration(sb: utils.SnippetStringBuilder, node: ts.MethodDeclaration | ts.FunctionDeclaration) {
+    private _emitMethodDeclaration(sb: utils.SnippetStringBuilder, node: ts.MethodDeclaration | ts.FunctionDeclaration, sourceFile: ts.SourceFile) {
         this._emitDescriptionHeader(sb);
         this._emitAuthor(sb);
         this._emitDate(sb);
+        this._emitSince(sb, node, sourceFile);
 
         this._emitModifiers(sb, node);
         this._emitTypeParameters(sb, node);
@@ -488,10 +493,29 @@ export class Documenter implements vs.Disposable {
         }
 
         node.typeParameters.forEach(parameter => {
-            sb.append(`@template ${ parameter.name.getText() }`);
+            sb.append(`@template ${parameter.name.getText()}`);
             sb.appendSnippetTabstop();
             sb.appendLine();
         });
+    }
+
+    private _emitSince(sb: utils.SnippetStringBuilder, node: ts.Node, sourceFile: ts.SourceFile) {
+        const config: vs.WorkspaceConfiguration = vs.workspace.getConfiguration();
+        if (config.get("docthis.includeSinceTag", false)
+            && (config.get("docthis.alwaysIncludeSince", false) || !node.modifiers.some(current => current.kind === ts.SyntaxKind.ProtectedKeyword || current.kind === ts.SyntaxKind.PrivateKeyword))
+        ) {
+            try {
+                const packagePath = pkgUp.sync(sourceFile.fileName);
+                if (packagePath) {
+                    const { version } = JSON.parse(readFileSync(packagePath, "utf-8"));
+                    sb.append("@since " + version);
+                    sb.appendSnippetTabstop();
+                    sb.appendLine();
+                }
+            } catch (e) {
+                console.error("Package.json can't be read: ", e.message);
+            }
+        }
     }
 
     private _emitHeritageClauses(sb: utils.SnippetStringBuilder, node: ts.ClassLikeDeclaration | ts.InterfaceDeclaration) {
@@ -510,7 +534,7 @@ export class Documenter implements vs.Disposable {
                     tn += ">";
                 }
 
-                sb.append(`${ heritageType } ${ utils.formatTypeName(tn) }`);
+                sb.append(`${heritageType} ${utils.formatTypeName(tn)}`);
                 sb.appendLine();
             });
         });
