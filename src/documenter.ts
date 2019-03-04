@@ -38,7 +38,11 @@ export class Documenter implements vs.Disposable {
 
         const position = ts.getPositionOfLineAndCharacter(sourceFile, caret.line, caret.character);
         const node = utils.findChildForPosition(sourceFile, position);
-        const documentNode = utils.nodeIsOfKind(node) ? node : utils.findFirstParent(node);
+        let documentNode = utils.nodeIsOfKind(node) ? node : utils.findFirstParent(node);
+        if (documentNode && documentNode.kind === ts.SyntaxKind.VariableDeclarationList) {
+            // extract VariableDeclaration from VariableDeclarationList
+            documentNode = (<ts.VariableDeclarationList> documentNode).declarations[0];
+        }
 
         if (!documentNode) {
             this._showFailureMessage(commandName, "at the current position");
@@ -225,7 +229,8 @@ export class Documenter implements vs.Disposable {
             }
         }
 
-        return;
+        sb.append(`@type {*}`);
+        return ts.getLineAndCharacterOfPosition(sourceFile, node.parent.getStart());
     }
 
     private _emitFunctionExpression(sb: utils.SnippetStringBuilder, node: ts.FunctionExpression | ts.ArrowFunction, sourceFile: ts.SourceFile) {
