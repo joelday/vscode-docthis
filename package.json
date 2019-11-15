@@ -95,6 +95,11 @@
           "type": "boolean",
           "default": false,
           "description": "When enabled, will add the @date tag in YYYY-MM-DD format."
+        },
+		"docthis.includeExtraLineAfterDescription": {
+          "type": "boolean",
+          "default": true,
+          "description": "When enabled, will jump a line after description free-type area before showing other tags"
         }
       }
     }

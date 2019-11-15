@@ -196,7 +196,9 @@ export class Documenter implements vs.Disposable {
             sb.appendLine();
 
             // Jump a line after description free-type area before showing other tags
-            sb.appendLine();
+            if (vs.workspace.getConfiguration().get("docthis.includeExtraLineAfterDescription", true)) {
+                sb.appendLine();
+            }
         }
     }
 
