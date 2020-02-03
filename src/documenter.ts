@@ -368,7 +368,13 @@ export class Documenter implements vs.Disposable {
 
     private _emitReturns(sb: utils.SnippetStringBuilder, node: ts.MethodDeclaration | ts.FunctionDeclaration | ts.FunctionExpression | ts.ArrowFunction) {
         if (utils.findNonVoidReturnInCurrentScope(node) || (node.type && node.type.getText() !== "void")) {
-            sb.append("@returns");
+            if (vs.workspace.getConfiguration().get("docthis.returnsTag", true)) {
+                sb.append("@returns ");
+            }
+            else {
+                sb.append("@return ");
+            }
+
             if (includeTypes() && node.type) {
                 sb.append(" " + utils.formatTypeName(node.type.getText()));
             }

@@ -2,7 +2,7 @@
   "name": "docthis",
   "displayName": "Document This",
   "description": "Automatically generates detailed JSDoc comments in TypeScript and JavaScript files.",
-  "version": "0.7.2",
+  "version": "0.8.1",
   "publisher": "joelday",
   "icon": "images/icon.png",
   "galleryBanner": {
@@ -95,6 +95,11 @@
           "type": "boolean",
           "default": false,
           "description": "When enabled, will add the @date tag in YYYY-MM-DD format."
+        },
+        "docthis.returnsTag": {
+          "type": "boolean",
+          "default": true,
+          "description": "Put @returns in place of @returns"
         }
       }
     }
