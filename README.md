@@ -6,7 +6,57 @@
 ![Demo](images/demo.gif)
 
 # Tags
-Supports JSDoc and Closure Compiler tags: @class, @description, @enum, @export, @function, @implements, @interface, @param, @private, @returns, @static, @template, @type, @memberOf and @date.
+Supports JSDoc and Closure Compiler tags: @class, @description, @enum, @export, @function, @implements, @interface, @param, @private, @returns or @return, @static, @template, @type, @memberOf and @date.
+
+# Options
+#### docthis.includeTypes
+When enabled, type information is added to comment tags.
+
+Default: true
+
+#### docthis.includeMemberOfOnClassMembers
+When enabled, memberOf information is added to comment tags on class members.
+
+Default: true
+
+#### docthis.includeMemberOfOnInterfaceMembers
+When enabled, memberOf information is added to comment tags on interface members.
+
+Default": true
+
+#### docthis.includeDescriptionTag
+When enabled, JSDoc comments for functions and methods will include @description.
+Default: false
+
+#### docthis.enableHungarianNotationEvaluation
+When enabled, hungarian notation will be used as a type hint.
+
+Default: false
+
+#### docthis.inferTypesFromNames
+When enabled, will use names of params & methods as type hints.
+
+Default: false
+
+#### docthis.includeAuthorTag
+When enabled, will add the @author tag.
+
+Default: false
+
+#### docthis.authorName
+When docthis.includeAuthorTag is enabled, will add @author tag with this value.
+
+Default: "(Set the text for this tag by adding docthis.authorName to your settings file.)"
+
+#### docthis.includeDateTag
+When enabled, will add the @date tag in YYYY-MM-DD format.
+
+Default: false
+
+#### docthis.returnsTag
+Put @returns in place of @returns
+
+Default: true
 
 # Commands
 ## Document This
