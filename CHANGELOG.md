@@ -1,3 +1,6 @@
+### 0.8.1
+- Add docthis.returnsTag. If true (default) add @returns in the comment, else add @return.
+
 ### 0.7.1
 - Trailing space regression fix.
 
