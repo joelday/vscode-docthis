@@ -96,6 +96,11 @@
           "default": false,
           "description": "When enabled, will add the @date tag in YYYY-MM-DD format."
         },
+        "docthis.inlineOneLiners": {
+          "type": "boolean",
+          "default": true,
+          "description": "When enabled, comments that only have one line, will be displayed in one line instead of three."
+        },
         "docthis.returnsTag": {
           "type": "boolean",
           "default": true,
