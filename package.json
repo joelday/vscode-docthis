@@ -2,7 +2,7 @@
   "name": "docthis",
   "displayName": "Document This",
   "description": "Automatically generates detailed JSDoc comments in TypeScript and JavaScript files.",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "publisher": "joelday",
   "icon": "images/icon.png",
   "galleryBanner": {
@@ -94,7 +94,12 @@
         "docthis.includeDateTag": {
           "type": "boolean",
           "default": false,
-          "description": "When enabled, will add the @date tag in YYYY-MM-DD format."
+          "description": "When enabled, will add the @date tag in DD-MM-YYYY"
+        },
+        "docthis.dateTagFormat": {
+          "type": "string",
+          "default": "DD-MM-YYYY",
+          "description": "Select date format. Defaults to DD-MM-YYYY"
         },
         "docthis.inlineOneLiners": {
           "type": "boolean",
@@ -122,6 +127,7 @@
     "vscode": "^1.1.29"
   },
   "dependencies": {
+    "dayjs": "^1.8.6",
     "typescript": "^2.9.1"
   },
   "bugs": {
