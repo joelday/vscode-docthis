@@ -39,7 +39,11 @@ export class Documenter implements vs.Disposable {
 
         const position = ts.getPositionOfLineAndCharacter(sourceFile, caret.line, caret.character);
         const node = utils.findChildForPosition(sourceFile, position);
-        const documentNode = utils.nodeIsOfKind(node) ? node : utils.findFirstParent(node);
+        let documentNode = utils.nodeIsOfKind(node) ? node : utils.findFirstParent(node);
+        if (documentNode && documentNode.kind === ts.SyntaxKind.VariableDeclarationList) {
+            // extract VariableDeclaration from VariableDeclarationList
+            documentNode = (<ts.VariableDeclarationList> documentNode).declarations[0];
+        }
 
         if (!documentNode) {
             this._showFailureMessage(commandName, "at the current position");
@@ -228,7 +232,8 @@ export class Documenter implements vs.Disposable {
             }
         }
 
-        return;
+        sb.append(`@type {*}`);
+        return ts.getLineAndCharacterOfPosition(sourceFile, node.parent.getStart());
     }
 
     private _emitFunctionExpression(sb: utils.SnippetStringBuilder, node: ts.FunctionExpression | ts.ArrowFunction, sourceFile: ts.SourceFile) {
@@ -371,7 +376,13 @@ export class Documenter implements vs.Disposable {
 
     private _emitReturns(sb: utils.SnippetStringBuilder, node: ts.MethodDeclaration | ts.FunctionDeclaration | ts.FunctionExpression | ts.ArrowFunction) {
         if (utils.findNonVoidReturnInCurrentScope(node) || (node.type && node.type.getText() !== "void")) {
-            sb.append("@returns");
+            if (vs.workspace.getConfiguration().get("docthis.returnsTag", true)) {
+                sb.append("@returns ");
+            }
+            else {
+                sb.append("@return ");
+            }
+
             if (includeTypes() && node.type) {
                 sb.append(" " + utils.formatTypeName(node.type.getText()));
             }
