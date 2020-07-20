@@ -1,3 +1,6 @@
+### 0.8.1
+- Add docthis.returnsTag. If true (default) add @returns in the comment, else add @return.
+
 ### 0.7.1
 - Trailing space regression fix.
 
@@ -6,34 +9,34 @@
 - Adding @mbaric1's date tag support.
 
 ### 0.6.0
-- Now uses a completion provider instead of automatic insertion when typing '/**'.
+- Now uses a completion provider instead of automatic insertion when typing `/**`.
 - No longer conflicts with VSCode's built in JSDoc generation!
 
 ### 0.5.0
 - Support documentation generation for class methods.
 
 ### 0.4.7
-- Protecting against error for /** auto documentation.
+- Protecting against error for `/**` auto documentation.
 
 ### 0.4.6
-- Fix @type and @memberOf being emitted on the same line.
+- Fix @type and `@memberOf` being emitted on the same line.
 
 ### 0.4.5
-- Add support of @author tag. Controlled using `docthis.includeAuthorTag` and `docthis.authorName` options.
-- No more unecessary jump lines for other tags than @description (to match use from usejsdoc.org)
+- Add support of `@author` tag. Controlled using `docthis.includeAuthorTag` and `docthis.authorName` options.
+- No more unecessary jump lines for other tags than `@description` (to match use from usejsdoc.org)
 
 ### 0.4.4
-- Change casing of @memberof to all lower-case.
+- Change casing of `@memberof` to all lower-case.
 
 ### 0.4.3
-- Omit @memberOf on unnamed classes.
+- Omit `@memberOf` on unnamed classes.
 
 ### 0.4.2
 - Support for unnamed classes.
 
 ### 0.4.1
 - Support for variable assigned function expressions.
-- No longer showing error message on /** autocomplete failures.
+- No longer showing error message on `/**` autocomplete failures.
 
 ### 0.4.0
 - Now adds documentation as snippets, with tab stops for descriptions!
@@ -50,13 +53,13 @@
 - Upgraded TypeScript and VSCode internals.
 
 ### 0.3.6
-- Adds .vue extension support.
+- Adds `.vue` extension support.
 
 ### 0.3.5
 - Adds support for hungarian notation for functions and methods. Controlled using the `docthis.enableHungarianNotationEvaluation` option.
 
 ### 0.3.4
-- Adds support for including a @description tag for functions and methods. Controlled using the `docthis.includeDescriptionTag` option.
+- Adds support for including a `@description` tag for functions and methods. Controlled using the `docthis.includeDescriptionTag` option.
 
 ### 0.3.3
 - Adds support for jumping to the description location of the inserted comment. Controlled using the `docthis.enableJumpToDescriptionLocation` option.
@@ -68,8 +71,8 @@
 - Adds a config option `docthis.includeTypes` used to disable insertion of type names in tags.
 
 ### 0.3.1
-- Fix an indenting issue with '/**' output.
-- No longer inserting '/**' output when caret is inside of the documented symbol.
+- Fix an indenting issue with `/**` output.
+- No longer inserting `/**` output when caret is inside of the documented symbol.
 
 ### 0.3.0
 - Typing `/**` now automatically attempts a documentation at the typed location.
@@ -78,24 +81,25 @@
 - Improved GitHub issue template.
 
 ### 0.2.4
-- No longer shows error for jsx and tsx files.
+- No longer shows error for `.jsx` and `.tsx` files.
 
 ### 0.2.3
-- @readonly is automatically added to property "get" accessors that are not accompanied by a "set" accessor.
+- `@readonly` is automatically added to property "get" accessors that are not accompanied by a "set" accessor.
 
 ### 0.2.2
-- Fixes issue where nested functions caused @returns to be added to void returning parents.
+- Fixes issue where nested functions caused `@returns` to be added to void returning parents.
 - Arrow functions were being ignored in various cases.
 
 ### 0.2.1
-- Add @returns whenever there is an explicit return type other than void.
+- Add `@returns` whenever there is an explicit return type other than void.
 
 ### 0.2.0
 - Support for documenting function expressions in assignment to properties or variables.
 - A new "Trace TypeScript Syntax Node" command that prints info about the node ancestry at a given caret position.
-- Resolving Mac system key binding collision.
+- Resolving macOS key binding collision.
 
 ### 0.1.16
-- @extends and @implements tags now contain type parameters for extended and implemented types.
-- Extension is activated at startup and lazily initialized internally so that a better error message can be shown when a .ts/.js document hasn't been opened yet.
+- `@extends` and `@implements` tags now contain type parameters for extended and implemented types.
+- Extension is activated at startup and lazily initialized internally so that a better error message can be shown
+  when a `.ts`/`.js` document hasn't been opened yet.
 - Errors now have a "Report Issue" button that opens a pre-filled GitHub issue form.

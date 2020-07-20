@@ -2,6 +2,10 @@ import * as path from "path";
 import * as ts from "typescript";
 import * as vs from "vscode";
 
+function inlineOneLiners() {
+    return vs.workspace.getConfiguration().get("docthis.inlineOneLiners", true);
+}
+
 const supportedNodeKinds = [
     ts.SyntaxKind.ClassDeclaration,
     ts.SyntaxKind.PropertyDeclaration,
@@ -17,7 +21,10 @@ const supportedNodeKinds = [
     ts.SyntaxKind.PropertySignature,
     ts.SyntaxKind.Constructor,
     ts.SyntaxKind.FunctionExpression,
-    ts.SyntaxKind.VariableDeclaration];
+    ts.SyntaxKind.VariableDeclaration,
+    ts.SyntaxKind.CallSignature,
+    ts.SyntaxKind.VariableDeclarationList,
+];
 
 export function emptyArray(arr: any[]) {
     while (arr.length > 0) {
@@ -232,9 +239,15 @@ export class SnippetStringBuilder {
     toCommentValue() {
         let sb = new StringBuilder();
 
+        const lines = this._snippet.value.split("\n");
+
+        const inline = lines.length === 1 && inlineOneLiners();
+
+        if (inline) {
+            sb.appendLine(`/** ${lines[0]} */`);
+        } else {
         sb.appendLine("/**");
 
-        const lines = this._snippet.value.split("\n");
         lines.forEach((line, i) => {
             if (line === "" && i === lines.length - 1) {
                 return;
@@ -251,16 +264,8 @@ export class SnippetStringBuilder {
         });
 
         sb.appendLine(" */");
+        }
 
         return new vs.SnippetString(sb.toString());
     }
-}
-
-export function getCurrentDate() {
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-
-    return year + "-" + ("0" + month).slice(-2) + "-" + ("0" + day).slice(-2);
 }

@@ -3,6 +3,7 @@ import * as ts from "typescript";
 import * as utils from "./utilities";
 import * as pkgUp from "pkg-up";
 import { readFileSync } from "fs";
+import * as dayjs from "dayjs";
 
 import { LanguageServiceHost } from "./languageServiceHost";
 import { Range } from "vscode";
@@ -40,7 +41,11 @@ export class Documenter implements vs.Disposable {
 
         const position = ts.getPositionOfLineAndCharacter(sourceFile, caret.line, caret.character);
         const node = utils.findChildForPosition(sourceFile, position);
-        const documentNode = utils.nodeIsOfKind(node) ? node : utils.findFirstParent(node);
+        let documentNode = utils.nodeIsOfKind(node) ? node : utils.findFirstParent(node);
+        if (documentNode && documentNode.kind === ts.SyntaxKind.VariableDeclarationList) {
+            // extract VariableDeclaration from VariableDeclarationList
+            documentNode = (<ts.VariableDeclarationList>documentNode).declarations[0];
+        }
 
         if (!documentNode) {
             this._showFailureMessage(commandName, "at the current position");
@@ -166,6 +171,7 @@ export class Documenter implements vs.Disposable {
             case ts.SyntaxKind.EnumMember:
                 sb.appendLine();
                 break;
+            case ts.SyntaxKind.CallSignature:
             case ts.SyntaxKind.FunctionDeclaration:
             case ts.SyntaxKind.MethodDeclaration:
             case ts.SyntaxKind.MethodSignature:
@@ -203,7 +209,7 @@ export class Documenter implements vs.Disposable {
 
     private _emitAuthor(sb: utils.SnippetStringBuilder) {
         if (vs.workspace.getConfiguration().get("docthis.includeAuthorTag", false)) {
-            let author: string = vs.workspace.getConfiguration().get("docthis.authorName", "");
+            const author: string = vs.workspace.getConfiguration().get("docthis.authorName", "");
             sb.append("@author " + author);
             sb.appendSnippetTabstop();
             sb.appendLine();
@@ -212,7 +218,9 @@ export class Documenter implements vs.Disposable {
 
     private _emitDate(sb: utils.SnippetStringBuilder) {
         if (vs.workspace.getConfiguration().get("docthis.includeDateTag", false)) {
-            sb.append("@date " + utils.getCurrentDate());
+            const dateFormat: string = vs.workspace.getConfiguration().get("docthis.dateTagFormat");
+            const dateToAppend: string = dayjs().format(dateFormat) || "";
+            sb.append("@date " + dateToAppend);
             sb.appendSnippetTabstop();
             sb.appendLine();
         }
@@ -226,7 +234,8 @@ export class Documenter implements vs.Disposable {
             }
         }
 
-        return;
+        sb.append(`@type {*}`);
+        return ts.getLineAndCharacterOfPosition(sourceFile, node.parent.getStart());
     }
 
     private _emitFunctionExpression(sb: utils.SnippetStringBuilder, node: ts.FunctionExpression | ts.ArrowFunction, sourceFile: ts.SourceFile) {
@@ -243,7 +252,8 @@ export class Documenter implements vs.Disposable {
         }
 
         this._emitDescriptionHeader(sb);
-
+        this._emitAuthor(sb);
+        this._emitDate(sb);
         this._emitTypeParameters(sb, node);
         this._emitParameters(sb, node);
         this._emitReturns(sb, node);
@@ -274,6 +284,8 @@ export class Documenter implements vs.Disposable {
 
     private _emitPropertyDeclaration(sb: utils.SnippetStringBuilder, node: ts.PropertyDeclaration | ts.AccessorDeclaration, sourceFile: ts.SourceFile) {
         this._emitDescriptionHeader(sb);
+        this._emitAuthor(sb);
+        this._emitDate(sb);
 
         if (node.kind === ts.SyntaxKind.GetAccessor) {
             const name = utils.findFirstChildOfKindDepthFirst(node, [ts.SyntaxKind.Identifier]).getText();
@@ -288,6 +300,10 @@ export class Documenter implements vs.Disposable {
         }
 
         this._emitModifiers(sb, node);
+
+        if (node.kind === ts.SyntaxKind.PropertyDeclaration) {
+            this._emitParameters(sb, node);
+        }
 
         // JSDoc fails to emit documentation for arrow function syntax. (https://github.com/jsdoc3/jsdoc/issues/1100)
         if (includeTypes()) {
@@ -317,6 +333,8 @@ export class Documenter implements vs.Disposable {
 
     private _emitEnumDeclaration(sb: utils.SnippetStringBuilder, node: ts.EnumDeclaration, sourceFile: ts.SourceFile) {
         this._emitDescriptionHeader(sb);
+        this._emitAuthor(sb);
+        this._emitDate(sb);
 
         this._emitModifiers(sb, node);
 
@@ -363,7 +381,13 @@ export class Documenter implements vs.Disposable {
 
     private _emitReturns(sb: utils.SnippetStringBuilder, node: ts.MethodDeclaration | ts.FunctionDeclaration | ts.FunctionExpression | ts.ArrowFunction) {
         if (utils.findNonVoidReturnInCurrentScope(node) || (node.type && node.type.getText() !== "void")) {
-            sb.append("@returns");
+            if (vs.workspace.getConfiguration().get("docthis.returnsTag", true)) {
+                sb.append("@returns ");
+            }
+            else {
+                sb.append("@return ");
+            }
+
             if (includeTypes() && node.type) {
                 sb.append(" " + utils.formatTypeName(node.type.getText()));
             }
@@ -391,11 +415,37 @@ export class Documenter implements vs.Disposable {
     }
 
     private _emitParameters(sb: utils.SnippetStringBuilder, node:
-        ts.MethodDeclaration | ts.FunctionDeclaration | ts.ConstructorDeclaration | ts.FunctionExpression | ts.ArrowFunction) {
+        ts.MethodDeclaration | ts.FunctionDeclaration | ts.ConstructorDeclaration | ts.FunctionExpression | ts.ArrowFunction | ts.PropertyDeclaration) {
 
-        if (!node.parameters) {
-            return;
+        if (node.kind === ts.SyntaxKind.PropertyDeclaration) {
+            const propertyChildren: ts.Node[] = node.getChildren();
+
+            const arrowFunction: ts.Node = propertyChildren.find((child: ts.Node) => {
+                return child.kind === ts.SyntaxKind.ArrowFunction;
+            });
+
+            if (!arrowFunction) {
+                return;
+            }
+
+            const isArrowFunction: boolean = ts.isArrowFunction(arrowFunction);
+
+            if (!isArrowFunction) {
+                return;
+            }
+
+            this._generateParameters(sb, arrowFunction as ts.ArrowFunction);
+        } else {
+            if (!node.parameters) {
+                return;
+            }
+
+            this._generateParameters(sb, node);
         }
+    }
+
+    private _generateParameters(sb: utils.SnippetStringBuilder, node:
+        ts.MethodDeclaration | ts.FunctionDeclaration | ts.ConstructorDeclaration | ts.FunctionExpression | ts.ArrowFunction): void {
 
         node.parameters.forEach(parameter => {
             const name = parameter.name.getText();
